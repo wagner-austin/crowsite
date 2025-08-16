@@ -3,7 +3,7 @@ import { Logger } from '../core/logger.js';
 export class ThemeManager {
     constructor() {
         this.logger = new Logger('ThemeManager');
-        this.themes = ['cyberpunk', 'synthwave', 'matrix', 'vaporwave'];
+        this.themes = ['poe-light', 'poe-dark']; // Only light and dark variants
         this.currentTheme = this.loadTheme();
         this.observers = [];
     }
@@ -15,14 +15,23 @@ export class ThemeManager {
     }
 
     loadTheme() {
-        const saved = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // Check current HTML theme
+        const htmlTheme = document.documentElement.dataset.theme;
+        if (htmlTheme && this.themes.includes(htmlTheme)) {
+            this.logger.debug('Using HTML theme:', htmlTheme);
+            return htmlTheme;
+        }
 
+        // Check saved preference
+        const saved = localStorage.getItem('theme');
         if (saved && this.themes.includes(saved)) {
+            this.logger.debug('Using saved theme:', saved);
             return saved;
         }
 
-        return prefersDark ? 'cyberpunk' : 'synthwave';
+        // Default to poe-light
+        this.logger.debug('Using default theme: poe-light');
+        return 'poe-light';
     }
 
     saveTheme(theme) {
@@ -36,7 +45,10 @@ export class ThemeManager {
             return;
         }
 
-        document.documentElement.dataset.theme = theme;
+        // Only update if theme actually changed
+        if (document.documentElement.dataset.theme !== theme) {
+            document.documentElement.dataset.theme = theme;
+        }
         this.currentTheme = theme;
         this.saveTheme(theme);
 
@@ -45,16 +57,21 @@ export class ThemeManager {
     }
 
     toggleTheme() {
-        const currentIndex = this.themes.indexOf(this.currentTheme);
-        const nextIndex = (currentIndex + 1) % this.themes.length;
-        const nextTheme = this.themes[nextIndex];
-
-        this.applyTheme(nextTheme);
-        this.logger.info('Theme toggled to:', nextTheme);
+        // Simple toggle between light and dark
+        const newTheme = this.currentTheme === 'poe-light' ? 'poe-dark' : 'poe-light';
+        this.applyTheme(newTheme);
+        this.logger.info('Theme toggled to:', newTheme);
     }
 
     setTheme(theme) {
         this.applyTheme(theme);
+    }
+
+    // Set theme variant (light/dark)
+    setThemeVariant(variant) {
+        const newTheme = `poe-${variant === 'light' ? 'light' : 'dark'}`;
+        this.applyTheme(newTheme);
+        this.logger.info('Theme variant set to:', newTheme);
     }
 
     getTheme() {
@@ -71,62 +88,26 @@ export class ThemeManager {
             this.logger.info('System theme preference changed:', e.matches ? 'dark' : 'light');
         });
 
-        document.addEventListener('keydown', e => {
-            if (e.ctrlKey && e.key === 't') {
-                e.preventDefault();
-                this.toggleTheme();
-            }
-        });
+        // Log system theme preference changes for debugging
     }
 
     applyThemeEffects(theme) {
-        const effects = {
-            cyberpunk: () => {
-                this.setCSSVariables({
-                    '--color-primary': '#00ffcc',
-                    '--color-secondary': '#ff00ff',
-                    '--color-accent': '#ffff00',
-                    '--color-bg-primary': '#0a0a0a',
-                    '--color-bg-secondary': '#1a1a1a',
-                });
-                this.applyGlitchEffect();
-            },
-            synthwave: () => {
-                this.setCSSVariables({
-                    '--color-primary': '#ff6ec7',
-                    '--color-secondary': '#7c4dff',
-                    '--color-accent': '#18ffff',
-                    '--color-bg-primary': '#0f0817',
-                    '--color-bg-secondary': '#1a0f2e',
-                });
-                this.applyNeonEffect();
-            },
-            matrix: () => {
-                this.setCSSVariables({
-                    '--color-primary': '#00ff41',
-                    '--color-secondary': '#008f11',
-                    '--color-accent': '#00ff41',
-                    '--color-bg-primary': '#000000',
-                    '--color-bg-secondary': '#001100',
-                });
-                this.applyMatrixEffect();
-            },
-            vaporwave: () => {
-                this.setCSSVariables({
-                    '--color-primary': '#ff71ce',
-                    '--color-secondary': '#01cdfe',
-                    '--color-accent': '#b967ff',
-                    '--color-bg-primary': '#1a0033',
-                    '--color-bg-secondary': '#2d1b69',
-                });
-                this.applyVaporwaveEffect();
-            },
-        };
+        // Clean up any inline styles
+        this.cleanupInlineStyles();
 
-        const effect = effects[theme];
-        if (effect) {
-            effect();
+        // All styling handled by CSS variables
+        this.logger.debug('Theme effects applied:', theme);
+    }
+
+    cleanupInlineStyles() {
+        // Remove root inline styles
+        const root = document.documentElement;
+        const rootStyle = root.style;
+        for (let i = rootStyle.length - 1; i >= 0; i--) {
+            const prop = rootStyle[i];
+            rootStyle.removeProperty(prop);
         }
+        this.logger.debug('Cleaned up inline styles');
     }
 
     setCSSVariables(variables) {
@@ -134,46 +115,6 @@ export class ThemeManager {
         Object.entries(variables).forEach(([property, value]) => {
             root.style.setProperty(property, value);
         });
-    }
-
-    applyGlitchEffect() {
-        const glitchElements = document.querySelectorAll('.glitch');
-        glitchElements.forEach(element => {
-            if (!element.dataset.text) {
-                element.dataset.text = element.textContent;
-            }
-        });
-    }
-
-    applyNeonEffect() {
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(button => {
-            button.style.textShadow = '0 0 10px currentColor';
-        });
-    }
-
-    applyMatrixEffect() {
-        const terminal = document.querySelector('.terminal-wrapper');
-        if (terminal) {
-            terminal.style.borderColor = '#00ff41';
-            terminal.style.boxShadow = '0 0 30px rgba(0, 255, 65, 0.6)';
-        }
-    }
-
-    applyVaporwaveEffect() {
-        const hero = document.querySelector('.hero-section');
-        if (hero) {
-            hero.style.background = `
-                linear-gradient(135deg, #1a0033 0%, #2d1b69 100%),
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(255, 113, 206, 0.03) 2px,
-                    rgba(255, 113, 206, 0.03) 4px
-                )
-            `;
-        }
     }
 
     observe(callback) {
