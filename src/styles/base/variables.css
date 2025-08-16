@@ -13,7 +13,6 @@
     --color-text-muted: #888888;
     --color-terminal-green: #00ff00;
     --color-terminal-amber: #ffaa00;
-    --color-matrix-green: #00ff41;
     --font-family-primary: "Courier New", "Consolas", monospace;
     --font-family-display: "Orbitron", "Roboto Mono", monospace;
     --font-family-code: "Fira Code", "Monaco", monospace;
@@ -54,44 +53,14 @@
     --z-index-popover: 3000;
     --z-index-tooltip: 4000;
     --z-index-loading: 5000;
-    --z-index-scanlines: 9998;
-    --z-index-noise: 9999;
+
+    /* Removed scanlines and noise z-indexes */
     --grid-columns: 12;
     --container-max-width: 1200px;
     --container-padding: var(--spacing-lg);
 }
 
-[data-theme="cyberpunk"] {
-    --color-primary: #00ffcc;
-    --color-secondary: #ff00ff;
-    --color-accent: #ffff00;
-    --color-bg-primary: #0a0a0a;
-    --color-bg-secondary: #1a1a1a;
-}
-
-[data-theme="synthwave"] {
-    --color-primary: #ff6ec7;
-    --color-secondary: #7c4dff;
-    --color-accent: #18ffff;
-    --color-bg-primary: #0f0817;
-    --color-bg-secondary: #1a0f2e;
-}
-
-[data-theme="matrix"] {
-    --color-primary: #00ff41;
-    --color-secondary: #008f11;
-    --color-accent: #00ff41;
-    --color-bg-primary: #000000;
-    --color-bg-secondary: #001100;
-}
-
-[data-theme="vaporwave"] {
-    --color-primary: #ff71ce;
-    --color-secondary: #01cdfe;
-    --color-accent: #b967ff;
-    --color-bg-primary: #1a0033;
-    --color-bg-secondary: #2d1b69;
-}
+/* Theme-specific variables are defined in theme files */
 
 @media (prefers-reduced-motion: reduce) {
     :root {
