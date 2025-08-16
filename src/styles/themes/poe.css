@@ -288,17 +288,18 @@
    ============================================ */
 
 @media (prefers-reduced-motion: reduce) {
-    [data-theme^="poe"] .crow,
-    [data-theme^="poe"] .feather,
-    [data-theme^="poe"] .particle,
-    [data-theme^="poe"] .typewriter-poe,
-    [data-theme^="poe"] .fade-in,
-    [data-theme^="poe"]:not(.is-zooming) .parallax-layer {
+    /* Only disable animations when not forcing motion */
+    :root:not([data-motion="force"]) [data-theme^="poe"] .crow,
+    :root:not([data-motion="force"]) [data-theme^="poe"] .feather,
+    :root:not([data-motion="force"]) [data-theme^="poe"] .particle,
+    :root:not([data-motion="force"]) [data-theme^="poe"] .typewriter-poe,
+    :root:not([data-motion="force"]) [data-theme^="poe"] .fade-in,
+    :root:not([data-motion="force"]) [data-theme^="poe"]:not(.animating) .parallax-layer {
         transition: none !important;
         animation: none !important;
     }
 
-    [data-theme^="poe"]:not(.is-zooming):not(.zoomed-in) .parallax-layer {
+    :root:not([data-motion="force"]) [data-theme^="poe"]:not(.animating):not(.zoomed) .parallax-layer {
         transform: none !important;
     }
 }
@@ -362,8 +363,8 @@
     top: 50%;
     right: -2%;
     transform: translateY(-50%);
-    height: 110vh;
-    max-height: 110%;
+    /* Scale based on viewport width on narrow screens, height on wide screens */
+    height: min(110vh, 55vw);
     width: auto;
 }
 
@@ -372,9 +373,17 @@
     top: 50%;
     left: -2%;
     transform: translateY(-50%);
-    height: 110vh;
-    max-height: 110%;
+    /* Scale based on viewport width on narrow screens, height on wide screens */
+    height: min(110vh, 55vw);
     width: auto;
+}
+
+/* Use dynamic viewport units when supported to prevent URL bar jump */
+@supports (height: 100dvh) {
+    [data-theme^="poe"] .tree-close-left,
+    [data-theme^="poe"] .tree-close-right {
+        height: min(110dvh, 55vw);
+    }
 }
 
 [data-theme^="poe"] .fence-bottom {
@@ -390,48 +399,7 @@
    Responsive Adjustments
    ============================================ */
 
-@media (width <= 768px) {
-    [data-theme^="poe"] .crow {
-        width: 35px;
-    }
-
-    [data-theme^="poe"] .feather {
-        width: 30px;
-    }
-    
-    /* Adjust positioned elements for mobile */
-    [data-theme^="poe"] .sun-element {
-        width: 25vw;
-    }
-    
-    [data-theme^="poe"] .town-background {
-        width: 95vw;
-        bottom: 2%;
-    }
-    
-    [data-theme^="poe"] .tree-left {
-        height: 70vh;
-    }
-    
-    [data-theme^="poe"] .shack-right {
-        height: 40vh;
-        right: 10%;
-    }
-    
-    [data-theme^="poe"] .bush-center {
-        height: 20vh;
-    }
-    
-    [data-theme^="poe"] .tree-close-right,
-    [data-theme^="poe"] .tree-close-left {
-        height: 100vh;
-        transform: translateY(-50%);
-    }
-    
-    [data-theme^="poe"] .fence-bottom {
-        height: 15vh;
-    }
-}
+/* Mobile adjustments removed - using desktop viewport */
 
 @media (width >= 1920px) {
     /* Larger screens - cap sizes */
