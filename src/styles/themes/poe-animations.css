@@ -1,7 +1,7 @@
 /* Scene animation timings (JS reads these) */
 :root {
-  --scene-zoom-ms: 1500ms;
-  --scene-zoom-out-ms: 1200ms;
+  --scene-zoom-ms: 2500ms;
+  --scene-zoom-out-ms: 2000ms;
 }
 
 /* Setup 3D perspective on container */
@@ -46,6 +46,13 @@
 /* Camera dolly: direct transform overrides during zoom - NO parallax vars */
 [data-theme^="poe"].zoomed-in .parallax-far-back {
   transform: translate3d(0, 0, 200px) !important;
+}
+/* Sun stays fixed in place during zoom */
+[data-theme^="poe"].zoomed-in .parallax-far-back:has(.sun-element) {
+  transform: translate3d(0, 0, 0) !important;
+}
+[data-theme^="poe"].zoomed-in .sun-element {
+  transform: translate(50%, -50%) scale(1.1) !important;
 }
 [data-theme^="poe"].zoomed-in .parallax-back {
   transform: translate3d(0, 0, 300px) !important;
