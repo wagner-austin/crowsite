@@ -250,13 +250,13 @@ export class ErrorHandler {
      * Show user-friendly error message
      */
     showUserMessage(error) {
-        // Check if terminal is available
-        const terminal = window.app?.terminal;
-        if (terminal) {
-            terminal.addLine(error.userMessage, 'error');
-        } else {
-            // Fallback to console
-            console.error(error.userMessage);
+        // Log to console for now
+        // Can be extended to show UI notifications later
+        console.error(error.userMessage);
+
+        // Emit event for any UI components to handle
+        if (window.app?.eventBus) {
+            window.app.eventBus.emit('error:display', error);
         }
     }
 
