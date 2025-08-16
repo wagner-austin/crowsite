@@ -1,0 +1,414 @@
+/* ============================================
+   POE THEME SYSTEM - Comprehensive Theming
+   ============================================ */
+
+/* 
+   This file defines a complete theming system that makes it easy to:
+   - Switch between light and dark modes
+   - Invert any element type
+   - Create new theme variations
+   - Apply consistent styling across all components
+*/
+
+/* ============================================
+   THEME DEFINITIONS
+   ============================================ */
+
+/* --- Light Theme (Default) --- */
+[data-theme="poe-light"] {
+    /* === Core Palette === */
+    --theme-mode: light;
+    --base-white: #ffffff;
+    --base-black: #000000;
+
+    /* Primary colors */
+    --color-bg-base: var(--base-white);
+    --color-fg-base: var(--base-black);
+
+    /* Background layers */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #fafafa;
+    --color-bg-tertiary: #f5f5f5;
+    --color-bg-elevated: #ffffff;
+    --color-bg-sunken: #f0f0f0;
+    --color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+    /* Foreground/Text layers */
+    --color-text-primary: #000000;
+    --color-text-secondary: #333333;
+    --color-text-tertiary: #666666;
+    --color-text-muted: #999999;
+    --color-text-disabled: #cccccc;
+    --color-text-inverse: #ffffff;
+
+    /* Borders */
+    --color-border-primary: rgba(0, 0, 0, 0.12);
+    --color-border-secondary: rgba(0, 0, 0, 0.08);
+    --color-border-tertiary: rgba(0, 0, 0, 0.04);
+
+    /* Shadows (for depth) */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.12);
+    --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.1);
+
+    /* === Image & Media Filters === */
+    --filter-none: none;
+    --filter-invert: invert(0);
+    --filter-brightness: brightness(1);
+    --filter-contrast: contrast(1);
+
+    /* Specific element filters */
+    --filter-images: var(--filter-none);
+    --filter-icons: var(--filter-none);
+    --filter-crow: var(--filter-none);
+    --filter-feathers: var(--filter-none);
+    --filter-trees: var(--filter-none);
+    --filter-buildings: var(--filter-none);
+    --filter-branches: var(--filter-none);
+    --filter-sky: var(--filter-none);
+    --filter-particles: var(--filter-none);
+
+    /* === Special Effects === */
+    --effect-blur: blur(0);
+    --effect-overlay-blend: multiply;
+    --effect-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --effect-box-reflection: none;
+
+    /* === Component Specific === */
+    /* Cards */
+    --card-bg: var(--color-bg-elevated);
+    --card-border: var(--color-border-secondary);
+    --card-shadow: var(--shadow-md);
+    --card-text: var(--color-text-primary);
+
+    /* Buttons */
+    --button-bg: transparent;
+    --button-bg-hover: var(--color-fg-base);
+    --button-text: var(--color-text-primary);
+    --button-text-hover: var(--color-bg-base);
+    --button-border: var(--color-border-primary);
+
+    /* Navigation */
+    --nav-bg: rgba(255, 255, 255, 0.95);
+    --nav-text: var(--color-text-primary);
+    --nav-border: var(--color-border-secondary);
+
+    /* Overlays */
+    --overlay-scrim: rgba(0, 0, 0, 0.4);
+    --overlay-gradient: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.03) 100%);
+}
+
+/* --- Dark Theme --- */
+[data-theme="poe-dark"] {
+    /* === Core Palette === */
+    --theme-mode: dark;
+    --base-white: #ffffff;
+    --base-black: #000000;
+
+    /* Primary colors (inverted) */
+    --color-bg-base: var(--base-black);
+    --color-fg-base: var(--base-white);
+
+    /* Background layers */
+    --color-bg-primary: #000000;
+    --color-bg-secondary: #0a0a0a;
+    --color-bg-tertiary: #141414;
+    --color-bg-elevated: #1a1a1a;
+    --color-bg-sunken: #000000;
+    --color-bg-overlay: rgba(255, 255, 255, 0.5);
+
+    /* Foreground/Text layers */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #e0e0e0;
+    --color-text-tertiary: #b0b0b0;
+    --color-text-muted: #808080;
+    --color-text-disabled: #404040;
+    --color-text-inverse: #000000;
+
+    /* Borders */
+    --color-border-primary: rgba(255, 255, 255, 0.12);
+    --color-border-secondary: rgba(255, 255, 255, 0.08);
+    --color-border-tertiary: rgba(255, 255, 255, 0.04);
+
+    /* Shadows (for depth) */
+    --shadow-color: rgba(255, 255, 255, 0.1);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.9);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.9);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.9);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.95);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 1);
+    --shadow-inner: inset 0 2px 4px rgba(255, 255, 255, 0.06);
+    --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.1);
+
+    /* === Image & Media Filters === */
+    --filter-none: none;
+    --filter-invert: invert(1);
+    --filter-brightness: brightness(0.9);
+    --filter-contrast: contrast(1.1);
+
+    /* Specific element filters */
+    --filter-images: var(--filter-invert);
+    --filter-icons: var(--filter-invert);
+    --filter-crow: var(--filter-invert);
+    --filter-feathers: var(--filter-invert);
+    --filter-trees: var(--filter-invert);
+    --filter-buildings: invert(0.85) opacity(0.9);
+    --filter-branches: var(--filter-invert);
+    --filter-sky: invert(0.9) hue-rotate(180deg);
+    --filter-particles: var(--filter-invert);
+
+    /* === Special Effects === */
+    --effect-blur: blur(0);
+    --effect-overlay-blend: screen;
+    --effect-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --effect-box-reflection: none;
+
+    /* === Component Specific === */
+    /* Cards */
+    --card-bg: var(--color-bg-elevated);
+    --card-border: var(--color-border-secondary);
+    --card-shadow: var(--shadow-md);
+    --card-text: var(--color-text-primary);
+
+    /* Buttons */
+    --button-bg: transparent;
+    --button-bg-hover: var(--color-fg-base);
+    --button-text: var(--color-text-primary);
+    --button-text-hover: var(--color-bg-base);
+    --button-border: var(--color-border-primary);
+
+    /* Navigation */
+    --nav-bg: rgba(0, 0, 0, 0.95);
+    --nav-text: var(--color-text-primary);
+    --nav-border: var(--color-border-secondary);
+
+    /* Overlays */
+    --overlay-scrim: rgba(255, 255, 255, 0.4);
+    --overlay-gradient: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+/* ============================================
+   UTILITY CLASSES FOR THEMING
+   ============================================ */
+
+/* Force theme inversion on specific elements */
+.theme-invert {
+    filter: var(--filter-invert) !important;
+}
+
+.theme-no-invert {
+    filter: none !important;
+}
+
+/* Background utilities */
+.bg-primary {
+    background: var(--color-bg-primary);
+}
+.bg-secondary {
+    background: var(--color-bg-secondary);
+}
+.bg-tertiary {
+    background: var(--color-bg-tertiary);
+}
+.bg-elevated {
+    background: var(--color-bg-elevated);
+}
+.bg-sunken {
+    background: var(--color-bg-sunken);
+}
+
+.bg-inverse {
+    background: var(--color-fg-base);
+    color: var(--color-bg-base);
+}
+
+/* Text utilities */
+.text-primary {
+    color: var(--color-text-primary);
+}
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+.text-tertiary {
+    color: var(--color-text-tertiary);
+}
+.text-muted {
+    color: var(--color-text-muted);
+}
+.text-disabled {
+    color: var(--color-text-disabled);
+}
+.text-inverse {
+    color: var(--color-text-inverse);
+}
+
+/* Border utilities */
+.border-primary {
+    border-color: var(--color-border-primary);
+}
+.border-secondary {
+    border-color: var(--color-border-secondary);
+}
+.border-tertiary {
+    border-color: var(--color-border-tertiary);
+}
+
+/* Shadow utilities */
+.shadow-xs {
+    box-shadow: var(--shadow-xs);
+}
+.shadow-sm {
+    box-shadow: var(--shadow-sm);
+}
+.shadow-md {
+    box-shadow: var(--shadow-md);
+}
+.shadow-lg {
+    box-shadow: var(--shadow-lg);
+}
+.shadow-xl {
+    box-shadow: var(--shadow-xl);
+}
+.shadow-inner {
+    box-shadow: var(--shadow-inner);
+}
+.shadow-glow {
+    box-shadow: var(--shadow-glow);
+}
+
+/* ============================================
+   THEME-AWARE COMPONENTS
+   ============================================ */
+
+/* Images that should adapt to theme */
+.theme-image,
+img[data-theme-aware="true"] {
+    filter: var(--filter-images);
+    transition: filter 0.3s ease;
+}
+
+/* Icons that should adapt to theme */
+.theme-icon,
+.icon[data-theme-aware="true"] {
+    filter: var(--filter-icons);
+    transition: filter 0.3s ease;
+}
+
+/* Cards with theme support */
+.theme-card {
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--card-text);
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+}
+
+/* Buttons with theme support */
+.theme-button {
+    border: 1px solid var(--button-border);
+    background: var(--button-bg);
+    color: var(--button-text);
+    transition: all 0.3s ease;
+}
+
+.theme-button:hover {
+    background: var(--button-bg-hover);
+    color: var(--button-text-hover);
+}
+
+/* Special effect overlays */
+.theme-overlay {
+    background: var(--overlay-gradient);
+    mix-blend-mode: var(--effect-overlay-blend);
+}
+
+/* ============================================
+   SCENERY & ENVIRONMENT
+   ============================================ */
+
+/* Parallax sprites with automatic theming */
+.scene-sky {
+    filter: var(--filter-sky);
+}
+.scene-trees {
+    filter: var(--filter-trees);
+}
+.scene-buildings {
+    filter: var(--filter-buildings);
+}
+.scene-branches {
+    filter: var(--filter-branches);
+}
+
+/* Animated elements */
+.creature-crow {
+    filter: var(--filter-crow);
+}
+.creature-feather {
+    filter: var(--filter-feathers);
+}
+.effect-particle {
+    filter: var(--filter-particles);
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS
+   ============================================ */
+
+/* Apply smooth transitions when theme changes */
+[data-theme^="poe"] * {
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        filter 0.3s ease;
+}
+
+/* Disable transitions for performance-sensitive elements */
+[data-theme^="poe"] .no-transition,
+[data-theme^="poe"] .parallax-layer,
+[data-theme^="poe"] .crow,
+[data-theme^="poe"] .feather {
+    transition: none !important;
+}
+
+/* ============================================
+   ACCESSIBILITY & PREFERENCES
+   ============================================ */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    [data-theme="poe-light"] {
+        --color-text-primary: #000000;
+        --color-bg-primary: #ffffff;
+        --color-border-primary: #000000;
+    }
+
+    [data-theme="poe-dark"] {
+        --color-text-primary: #ffffff;
+        --color-bg-primary: #000000;
+        --color-border-primary: #ffffff;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    [data-theme^="poe"] * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* System theme preference */
+@media (prefers-color-scheme: dark) {
+    /* Auto-apply dark theme if no preference is set */
+    [data-theme="auto"] {
+        /* Copy dark theme variables here */
+    }
+}
