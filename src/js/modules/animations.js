@@ -207,8 +207,8 @@ export class Animations {
         const ripple = document.createElement('span');
         const rect = button.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
-        const x = event.clientX - rect.left - (size / 2);
-        const y = event.clientY - rect.top - (size / 2);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
 
         ripple.style.cssText = `
             position: absolute;
@@ -310,7 +310,7 @@ export class Animations {
         const stepDuration = duration / steps;
         let currentStep = 0;
 
-        const interpolate = (start, end, progress) => start + ((end - start) * progress);
+        const interpolate = (start, end, progress) => start + (end - start) * progress;
 
         const timer = setInterval(() => {
             currentStep += 1;
