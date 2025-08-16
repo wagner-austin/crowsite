@@ -6,12 +6,8 @@ const isPoeTheme = () => {
 };
 
 /* Update these arrays with your filenames */
-const CROW_SPRITES = [
-    'assets/poe/crow/crow_flying_from_a_distance_2x3.png',
-];
-const FEATHER_SPRITES = [
-    'assets/poe/feathers/feather_one_2x3.png',
-];
+const CROW_SPRITES = ['assets/poe/crow/crow_flying_from_a_distance_2x3.png'];
+const FEATHER_SPRITES = ['assets/poe/feathers/feather_one_2x3.png'];
 
 // Fallback SVGs (simple, small) - using black fill with currentColor for theme adaptation
 const CROW_SVG_FALLBACK = `data:image/svg+xml;base64,${window.btoa(
@@ -81,7 +77,7 @@ function spawnCrow() {
     };
 
     const vh = window.innerHeight;
-    const startTop = 10 + Math.random() * (vh * 0.15);  // Top 10% to 25% of screen
+    const startTop = 10 + Math.random() * (vh * 0.15); // Top 10% to 25% of screen
     // Crow PNGs face right, so always fly left to right
     el.style.top = `${startTop}px`;
     el.style.left = `-150px`;
@@ -103,16 +99,17 @@ const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
 function physicsFall(el, { vx, vy }) {
     // Floaty fall (from last tweak)
-    const G = 340;       // gravity px/s^2
-    const DRAG_X = 1.2;  // horizontal drag 1/s
-    const VTERM = 160;   // vertical terminal velocity px/s
+    const G = 340; // gravity px/s^2
+    const DRAG_X = 1.2; // horizontal drag 1/s
+    const VTERM = 160; // vertical terminal velocity px/s
     const MAX_TIME = 20; // s
 
     // Oscillating tilt instead of full spin - natural feather flutter
-    const ANG_FREQ = 0.08 + Math.random() * 0.12;   // very slow: 0.08-0.2 cycles per second
-    const ANG_PHASE = 0;                             // Start at 0 to begin pointing down
+    const ANG_FREQ = 0.08 + Math.random() * 0.12; // very slow: 0.08-0.2 cycles per second
+    const ANG_PHASE = 0; // Start at 0 to begin pointing down
 
-    let x = 0, y = 0;
+    let x = 0;
+    let y = 0;
     let tPrev = performance.now();
     let tOsc = 0;
 
@@ -123,7 +120,7 @@ function physicsFall(el, { vx, vy }) {
     el.offsetHeight;
     el.style.opacity = '1';
 
-    const step = (now) => {
+    const step = now => {
         const dt = Math.min(0.05, (now - tPrev) / 1000);
         tPrev = now;
         tOsc += dt;
@@ -139,13 +136,13 @@ function physicsFall(el, { vx, vy }) {
         // Use a fade-in multiplier that grows from 0 to 1 over the first 2 seconds
         const fadeInTime = 2.0; // seconds to reach full oscillation
         const oscillationStrength = Math.min(1, tOsc / fadeInTime);
-        
+
         // sin oscillates between -1 and 1, map to 0..1 for our range
         const sineValue = Math.sin(2 * Math.PI * ANG_FREQ * tOsc);
         const normalizedSine = (sineValue + 1) / 2; // Convert -1..1 to 0..1
-        
+
         // Start at 0°, gradually oscillate between 10° and 100°
-        const targetAngle = 10 + (normalizedSine * 90); // Target oscillation 10..100
+        const targetAngle = 10 + normalizedSine * 90; // Target oscillation 10..100
         const angle = targetAngle * oscillationStrength; // Fade in the oscillation
 
         el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}deg)`;
@@ -195,7 +192,7 @@ function spawnFeather() {
     const vx0 = clamp(mouseVelX * VX_SCALE, -300, 300); // Also reduced max velocity
     const vy0 = Math.max(0, mouseVelY * VY_SCALE);
 
-    document.body.appendChild(el);      // Append first so reflow works
+    document.body.appendChild(el); // Append first so reflow works
     physicsFall(el, { vx: vx0, vy: vy0 }); // Then start the physics loop
 }
 
@@ -221,10 +218,11 @@ export function initPoeDecor() {
     ensureParticles();
 
     // Track mouse movement and velocity for feather spawning
-    const onPointerMove = (e) => {
+    const onPointerMove = e => {
         const now = performance.now();
         const dt = Math.max(1, now - lastMoveTime) / 1000; // seconds
-        const nx = e.clientX, ny = e.clientY;
+        const nx = e.clientX;
+        const ny = e.clientY;
         const vx = (nx - lastMouseX) / dt; // px/s
         const vy = (ny - lastMouseY) / dt; // px/s
         const a = 0.6; // smoothing
@@ -234,7 +232,7 @@ export function initPoeDecor() {
         lastMouseY = ny;
         lastMoveTime = now;
     };
-    
+
     document.addEventListener('pointermove', onPointerMove, { passive: true });
 
     // Small "hello" touch

@@ -299,7 +299,7 @@
         animation: none !important;
     }
 
-    :root:not([data-motion="force"]) [data-theme^="poe"]:not(.animating):not(.zoomed) .parallax-layer {
+    :root:not([data-motion="force"]) [data-theme^="poe"]:not(.animating, .zoomed) .parallax-layer {
         transform: none !important;
     }
 }
@@ -313,9 +313,9 @@
     position: absolute;
     top: 20%;
     right: 30%;
-    transform: translate(50%, -50%);
     width: min(18vw, 180px);
     height: auto;
+    transform: translate(50%, -50%);
 }
 
 /* Town background */
@@ -323,10 +323,10 @@
     position: absolute;
     bottom: 25%;
     left: 50%;
-    transform: translateX(-50%);
     width: 45vw;
     max-width: 650px;
     height: auto;
+    transform: translateX(-50%);
 }
 
 /* Mid layer elements */
@@ -334,27 +334,27 @@
     position: absolute;
     bottom: 0;
     left: 2%;
+    width: auto;
     height: 80vh;
     max-height: 80%;
-    width: auto;
 }
 
 [data-theme^="poe"] .shack-right {
     position: absolute;
-    bottom: 0;
     right: 20%;
+    bottom: 0;
+    width: auto;
     height: 50vh;
     max-height: 50%;
-    width: auto;
 }
 
 [data-theme^="poe"] .bush-center {
     position: absolute;
     bottom: 0;
     left: 35%;
+    width: auto;
     height: 30vh;
     max-height: 30%;
-    width: auto;
 }
 
 /* Front layer elements */
@@ -362,20 +362,22 @@
     position: absolute;
     top: 50%;
     right: -2%;
-    transform: translateY(-50%);
+    width: auto;
+
     /* Scale based on viewport width on narrow screens, height on wide screens */
     height: min(110vh, 55vw);
-    width: auto;
+    transform: translateY(-50%);
 }
 
 [data-theme^="poe"] .tree-close-left {
     position: absolute;
     top: 50%;
     left: -2%;
-    transform: translateY(-50%);
+    width: auto;
+
     /* Scale based on viewport width on narrow screens, height on wide screens */
     height: min(110vh, 55vw);
-    width: auto;
+    transform: translateY(-50%);
 }
 
 /* Use dynamic viewport units when supported to prevent URL bar jump */
@@ -390,9 +392,9 @@
     position: absolute;
     bottom: 0;
     left: 30%;
+    width: auto;
     height: 25vh;
     max-height: 25%;
-    width: auto;
 }
 
 /* ============================================

@@ -515,7 +515,6 @@ export class ImageManager {
         }
     }
 
-
     /**
      * Preload critical images
      */

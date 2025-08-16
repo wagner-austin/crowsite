@@ -88,28 +88,32 @@ export function initPoeParallax() {
     wireParallaxSprites();
 
     // Tag sun's parent with has-sun class for CSS (avoids expensive :has selector)
-    document.querySelectorAll('.sun-element').forEach((sun) => {
+    document.querySelectorAll('.sun-element').forEach(sun => {
         const parent = sun.closest('.parallax-far-back');
-        if (parent) parent.classList.add('has-sun');
+        if (parent) {
+            parent.classList.add('has-sun');
+        }
     });
 
     // Force animations even with reduced motion enabled
     document.documentElement.setAttribute('data-motion', 'force');
-    
+
     const coarse = window.matchMedia('(pointer: coarse)').matches;
 
     const MAX_X = 12;
     const MAX_Y = 10;
-    const DEAD_ZONE = 0.08;    // 8% dead zone from center (16% total diameter)
-    let mx = 0, my = 0;        // current
-    let tx = 0, ty = 0;        // target
+    const DEAD_ZONE = 0.08; // 8% dead zone from center (16% total diameter)
+    let mx = 0;
+    let my = 0; // current
+    let tx = 0;
+    let ty = 0; // target
     let lastClientX = window.innerWidth / 2;
     let lastClientY = window.innerHeight / 2;
-    let running = true;  // Always run, ignore reduced motion
+    let running = true; // Always run, ignore reduced motion
     // pointer influence ramps 0→1 to prevent initial jump
     let influence = 0;
-    let influenceTarget = 0;   // 0 at load; set to 1 after first input
-    
+    let influenceTarget = 0; // 0 at load; set to 1 after first input
+
     // Apply dead zone with smooth transition
     const applyDeadZone = (value, deadZone) => {
         const abs = Math.abs(value);
@@ -119,18 +123,18 @@ export function initPoeParallax() {
         }
         // Outside dead zone - remap to full range
         const sign = value < 0 ? -1 : 1;
-        const remapped = (abs - deadZone) / (0.5 - deadZone) * 0.5;
+        const remapped = ((abs - deadZone) / (0.5 - deadZone)) * 0.5;
         return sign * remapped;
     };
-    
+
     const setTargetsFromLastPointer = () => {
         // Normalize to -0.5 to 0.5 range
         const nx = lastClientX / window.innerWidth - 0.5;
         const ny = lastClientY / window.innerHeight - 0.5;
-        
+
         const dx = applyDeadZone(nx, DEAD_ZONE);
         const dy = applyDeadZone(ny, DEAD_ZONE);
-        
+
         tx = dx * MAX_X;
         ty = dy * MAX_Y;
     };
@@ -138,16 +142,16 @@ export function initPoeParallax() {
     const apply = () => {
         const sy = window.scrollY || 0;
         const isAnimating = document.documentElement.classList.contains('animating');
-        
+
         // Skip entirely during zoom animation - values already set in zoom:start
         if (isAnimating) {
             return;
         }
-        
+
         // Reduce parallax when zoomed in for subtle movement
         const isZoomed = document.documentElement.classList.contains('zoomed');
         const zoomDamping = isZoomed ? 0.5 : 1;
-        
+
         layers.forEach((el, i) => {
             const s = parseFloat(el.dataset.speed || '0') * zoomDamping * influence;
             const sc = parseFloat(el.dataset.scroll || '0') * zoomDamping * influence;
@@ -156,21 +160,23 @@ export function initPoeParallax() {
             el.style.setProperty('--dx', `${dx}px`);
             el.style.setProperty('--dy', `${dy}px`);
             el.style.setProperty('--sy', `${sy * sc}px`);
-            
+
             // Debug all layers when zoomed
             if (isZoomed && Math.abs(mx) > 1) {
-                console.log(`Layer ${i}:`, { 
+                console.log(`Layer ${i}:`, {
                     class: el.className,
-                    speed: el.dataset.speed, 
-                    dx: dx.toFixed(1), 
-                    dy: dy.toFixed(1) 
+                    speed: el.dataset.speed,
+                    dx: dx.toFixed(1),
+                    dy: dy.toFixed(1),
                 });
             }
         });
     };
 
     const tick = () => {
-        if (!running) return;
+        if (!running) {
+            return;
+        }
         // Skip updates during zoom animation
         if (document.documentElement.classList.contains('animating')) {
             // Reset to neutral during zoom
@@ -183,8 +189,8 @@ export function initPoeParallax() {
         }
         // Use slower smoothing when zoomed in
         const isZoomed = document.documentElement.classList.contains('zoomed');
-        const k = isZoomed ? 0.03 : 0.06;    // position smoothing - extra slow when zoomed
-        const r = 0.02;    // influence ramp smoothing - extra slow for smooth resume after zoom
+        const k = isZoomed ? 0.03 : 0.06; // position smoothing - extra slow when zoomed
+        const r = 0.02; // influence ramp smoothing - extra slow for smooth resume after zoom
         mx += (tx - mx) * k;
         my += (ty - my) * k;
         influence += (influenceTarget - influence) * r;
@@ -197,36 +203,40 @@ export function initPoeParallax() {
         lastClientX = e.clientX;
         lastClientY = e.clientY;
         // Skip only during zoom animation, allow when zoomed in
-        if (document.documentElement.classList.contains('animating')) return;
+        if (document.documentElement.classList.contains('animating')) {
+            return;
+        }
         influenceTarget = 1;
         setTargetsFromLastPointer();
     };
 
     const onLeave = () => {
-        tx = 0; ty = 0;
+        tx = 0;
+        ty = 0;
         influenceTarget = 0; // ease back to neutral
     };
 
     const onVisibility = () => {
-        running = !document.hidden;  // Ignore reduced motion
+        running = !document.hidden; // Ignore reduced motion
         if (running) {
             window.requestAnimationFrame(tick);
         }
     };
 
-
     const onMotion = e => {
-        if (!coarse) return;  // Ignore reduced motion, only check for touch device
+        if (!coarse) {
+            return;
+        } // Ignore reduced motion, only check for touch device
         const gx = e.gamma ?? 0;
         const gy = e.beta ?? 0;
-        
+
         // Normalize device tilt to -0.5 to 0.5 range
         const nx = Math.max(-0.5, Math.min(0.5, gx / 90));
         const ny = Math.max(-0.5, Math.min(0.5, gy / 90));
-        
+
         const dx = applyDeadZone(nx, DEAD_ZONE);
         const dy = applyDeadZone(ny, DEAD_ZONE);
-        
+
         influenceTarget = 1;
         tx = dx * MAX_X;
         ty = dy * MAX_Y;
@@ -243,7 +253,7 @@ export function initPoeParallax() {
             el.style.setProperty('--sy', '0px');
         });
     });
-    
+
     document.documentElement.addEventListener('zoom:end', () => {
         // exact sync: no delta = no jump
         setTargetsFromLastPointer();
@@ -252,7 +262,7 @@ export function initPoeParallax() {
         // Wait a bit longer before ramping influence back up
         setTimeout(() => {
             influenceTarget = 1;
-        }, 300);  // 300ms delay before starting to ease back to mouse
+        }, 300); // 300ms delay before starting to ease back to mouse
     });
 
     const ctrl = new window.AbortController();
@@ -262,7 +272,6 @@ export function initPoeParallax() {
     window.addEventListener('pointerleave', onLeave, opts);
     window.addEventListener('scroll', apply, opts); // recompute on scroll
     document.addEventListener('visibilitychange', onVisibility, { signal: ctrl.signal });
-
 
     if ('DeviceOrientationEvent' in window) {
         window.addEventListener('deviceorientation', onMotion, opts);
@@ -289,7 +298,11 @@ export function initPoeParallax() {
     // Start perfectly centered; we won't react to pointer until it moves (or device motion fires)
     apply();
     // Optional: on touch devices, "auto-wake" pointer influence after a brief delay so the scene isn't static
-    if (coarse) setTimeout(() => { influenceTarget = 1; }, 250);
+    if (coarse) {
+        setTimeout(() => {
+            influenceTarget = 1;
+        }, 250);
+    }
 
     return () => {
         ctrl.abort();

@@ -209,15 +209,19 @@
 .bg-primary {
     background: var(--color-bg-primary);
 }
+
 .bg-secondary {
     background: var(--color-bg-secondary);
 }
+
 .bg-tertiary {
     background: var(--color-bg-tertiary);
 }
+
 .bg-elevated {
     background: var(--color-bg-elevated);
 }
+
 .bg-sunken {
     background: var(--color-bg-sunken);
 }
@@ -231,18 +235,23 @@
 .text-primary {
     color: var(--color-text-primary);
 }
+
 .text-secondary {
     color: var(--color-text-secondary);
 }
+
 .text-tertiary {
     color: var(--color-text-tertiary);
 }
+
 .text-muted {
     color: var(--color-text-muted);
 }
+
 .text-disabled {
     color: var(--color-text-disabled);
 }
+
 .text-inverse {
     color: var(--color-text-inverse);
 }
@@ -251,9 +260,11 @@
 .border-primary {
     border-color: var(--color-border-primary);
 }
+
 .border-secondary {
     border-color: var(--color-border-secondary);
 }
+
 .border-tertiary {
     border-color: var(--color-border-tertiary);
 }
@@ -262,21 +273,27 @@
 .shadow-xs {
     box-shadow: var(--shadow-xs);
 }
+
 .shadow-sm {
     box-shadow: var(--shadow-sm);
 }
+
 .shadow-md {
     box-shadow: var(--shadow-md);
 }
+
 .shadow-lg {
     box-shadow: var(--shadow-lg);
 }
+
 .shadow-xl {
     box-shadow: var(--shadow-xl);
 }
+
 .shadow-inner {
     box-shadow: var(--shadow-inner);
 }
+
 .shadow-glow {
     box-shadow: var(--shadow-glow);
 }
@@ -335,12 +352,15 @@ img[data-theme-aware="true"] {
 .scene-sky {
     filter: var(--filter-sky);
 }
+
 .scene-trees {
     filter: var(--filter-trees);
 }
+
 .scene-buildings {
     filter: var(--filter-buildings);
 }
+
 .scene-branches {
     filter: var(--filter-branches);
 }
@@ -349,9 +369,11 @@ img[data-theme-aware="true"] {
 .creature-crow {
     filter: var(--filter-crow);
 }
+
 .creature-feather {
     filter: var(--filter-feathers);
 }
+
 .effect-particle {
     filter: var(--filter-particles);
 }

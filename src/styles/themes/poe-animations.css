@@ -13,17 +13,17 @@
 
 /* Scene animation timings (JS reads these) */
 :root {
-  --scene-zoom-ms: 2500ms;
-  --scene-zoom-out-ms: 2000ms;
-  --scene-zoom-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --scene-zoom-ms: 2500ms;
+    --scene-zoom-out-ms: 2000ms;
+    --scene-zoom-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================
    3D Perspective Setup
    ============================================ */
 [data-theme^="poe"] .parallax-container {
-  perspective: 1000px;
-  perspective-origin: center center;
+    perspective: 1000px;
+    perspective-origin: center center;
 }
 
 /* ============================================
@@ -32,23 +32,25 @@
 
 /* All layers get transitions when animating */
 [data-theme^="poe"].animating .parallax-layer {
-  transition: transform var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
+    transition: transform var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
 }
 
 /* Use zoom-out timing when not zoomed */
 [data-theme^="poe"].animating:not(.zoomed) .parallax-layer {
-  transition: transform var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
+    transition: transform var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
 }
 
 /* Sprites and other elements */
 [data-theme^="poe"].animating .parallax-sprite {
-  transition: transform var(--scene-zoom-ms) var(--scene-zoom-easing),
-              opacity var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
+    transition:
+        transform var(--scene-zoom-ms) var(--scene-zoom-easing),
+        opacity var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
 }
 
 [data-theme^="poe"].animating:not(.zoomed) .parallax-sprite {
-  transition: transform var(--scene-zoom-out-ms) var(--scene-zoom-easing),
-              opacity var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
+    transition:
+        transform var(--scene-zoom-out-ms) var(--scene-zoom-easing),
+        opacity var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
 }
 
 /* ============================================
@@ -56,13 +58,13 @@
    ============================================ */
 [data-zoom-trigger],
 [data-theme^="poe"] .parallax-sprite[data-zoom-trigger] {
-  cursor: pointer !important;
-  pointer-events: auto !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
 }
 
 [data-zoom-trigger]:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.6);
-  outline-offset: 2px;
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
 }
 
 /* ============================================
@@ -71,24 +73,24 @@
 
 /* During zoom in animation */
 [data-theme^="poe"].animating.zoomed .parallax-far-back {
-  transform: translateZ(200px) !important;
+    transform: translateZ(200px) !important;
 }
 
 /* Sun's parent stays in place during zoom (using cheap class instead of :has) */
 [data-theme^="poe"].animating.zoomed .parallax-far-back.has-sun {
-  transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
 }
 
 [data-theme^="poe"].animating.zoomed .parallax-back {
-  transform: translateZ(300px) !important;
+    transform: translateZ(300px) !important;
 }
 
 [data-theme^="poe"].animating.zoomed .parallax-mid {
-  transform: translateZ(400px) !important;
+    transform: translateZ(400px) !important;
 }
 
 [data-theme^="poe"].animating.zoomed .parallax-front {
-  transform: translateZ(600px) !important;
+    transform: translateZ(600px) !important;
 }
 
 /* ============================================
@@ -97,24 +99,24 @@
 
 /* After zoom completes, enable parallax movement */
 [data-theme^="poe"].zoomed:not(.animating) .parallax-far-back {
-  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 200px) !important;
+    transform: translate3d(var(--dx, 0), calc(var(--dy, 0px) + var(--sy, 0px)), 200px) !important;
 }
 
 /* Sun's parent continues to stay fixed (using cheap class instead of :has) */
 [data-theme^="poe"].zoomed:not(.animating) .parallax-far-back.has-sun {
-  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 0) !important;
+    transform: translate3d(var(--dx, 0), calc(var(--dy, 0px) + var(--sy, 0px)), 0) !important;
 }
 
 [data-theme^="poe"].zoomed:not(.animating) .parallax-back {
-  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 300px) !important;
+    transform: translate3d(var(--dx, 0), calc(var(--dy, 0px) + var(--sy, 0px)), 300px) !important;
 }
 
 [data-theme^="poe"].zoomed:not(.animating) .parallax-mid {
-  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 400px) !important;
+    transform: translate3d(var(--dx, 0), calc(var(--dy, 0px) + var(--sy, 0px)), 400px) !important;
 }
 
 [data-theme^="poe"].zoomed:not(.animating) .parallax-front {
-  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 600px) !important;
+    transform: translate3d(var(--dx, 0), calc(var(--dy, 0px) + var(--sy, 0px)), 600px) !important;
 }
 
 /* ============================================
@@ -126,7 +128,7 @@
 [data-theme^="poe"].animating:not(.zoomed) .parallax-back,
 [data-theme^="poe"].animating:not(.zoomed) .parallax-mid,
 [data-theme^="poe"].animating:not(.zoomed) .parallax-front {
-  transform: translate3d(0, 0, 0) !important;
+    transform: translate3d(0, 0, 0) !important;
 }
 
 /* ============================================
@@ -136,25 +138,27 @@
 
 /* Base sun transform with CSS variable for scale */
 [data-theme^="poe"] .sun-element {
-  transform: translate3d(50%, -50%, 0) scale(var(--sun-scale, 1));
-  transform-origin: 50% 50%;
+    transform: translate3d(50%, -50%, 0) scale(var(--sun-scale, 1));
+    transform-origin: 50% 50%;
 }
 
 /* Sun scales up when zoomed */
 [data-theme^="poe"].zoomed .sun-element {
-  --sun-scale: 1.1;
-  transition: transform var(--scene-zoom-ms) var(--scene-zoom-easing);
+    --sun-scale: 1.1;
+
+    transition: transform var(--scene-zoom-ms) var(--scene-zoom-easing);
 }
 
 /* Sun returns to normal during zoom out */
 [data-theme^="poe"].animating:not(.zoomed) .sun-element {
-  --sun-scale: 1;
-  transition: transform var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
+    --sun-scale: 1;
+
+    transition: transform var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
 }
 
 /* GPU optimization for sun during animation */
 [data-theme^="poe"].animating .sun-element {
-  will-change: transform;
+    will-change: transform;
 }
 
 /* ============================================
@@ -164,34 +168,36 @@
 /* Trees slide out during zoom in */
 [data-theme^="poe"].animating.zoomed .tree-close-left,
 [data-theme^="poe"].animating.zoomed .tree-close-right {
-  transition: transform var(--scene-zoom-ms) var(--scene-zoom-easing),
-              opacity var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
+    transition:
+        transform var(--scene-zoom-ms) var(--scene-zoom-easing),
+        opacity var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
 }
 
 /* Trees slide back during zoom out - consistent transform list */
 [data-theme^="poe"].animating:not(.zoomed) .tree-close-left,
 [data-theme^="poe"].animating:not(.zoomed) .tree-close-right {
-  transition: transform var(--scene-zoom-out-ms) var(--scene-zoom-easing),
-              opacity var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
-  transform: translateX(0) translateY(-50%) !important;
-  opacity: 1 !important;
+    opacity: 1 !important;
+    transform: translateX(0) translateY(-50%) !important;
+    transition:
+        transform var(--scene-zoom-out-ms) var(--scene-zoom-easing),
+        opacity var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
 }
 
 /* Trees hidden when zoomed (steady state) */
 [data-theme^="poe"].zoomed .tree-close-left {
-  transform: translateX(-80vw) translateY(-50%) !important;
-  opacity: 0 !important;
+    opacity: 0 !important;
+    transform: translateX(-80vw) translateY(-50%) !important;
 }
 
 [data-theme^="poe"].zoomed .tree-close-right {
-  transform: translateX(80vw) translateY(-50%) !important;
-  opacity: 0 !important;
+    opacity: 0 !important;
+    transform: translateX(80vw) translateY(-50%) !important;
 }
 
 /* GPU optimization during animation only */
 [data-theme^="poe"].animating .tree-close-left,
 [data-theme^="poe"].animating .tree-close-right {
-  will-change: transform, opacity;
+    will-change: transform, opacity;
 }
 
 /* ============================================
@@ -200,26 +206,26 @@
 
 /* Respect reduced motion preference ONLY when not forcing motion */
 @media (prefers-reduced-motion: reduce) {
-  /* Disable transitions only when data-motion="force" is NOT set */
-  :root:not([data-motion="force"]) [data-theme^="poe"] .parallax-layer,
-  :root:not([data-motion="force"]) [data-theme^="poe"] .parallax-sprite {
-    transition: none !important;
-  }
-  
-  /* Still apply the transforms without animation, but only when not forcing */
-  :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-far-back {
-    transform: translateZ(200px) !important;
-  }
-  
-  :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-back {
-    transform: translateZ(300px) !important;
-  }
-  
-  :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-mid {
-    transform: translateZ(400px) !important;
-  }
-  
-  :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-front {
-    transform: translateZ(600px) !important;
-  }
+    /* Disable transitions only when data-motion="force" is NOT set */
+    :root:not([data-motion="force"]) [data-theme^="poe"] .parallax-layer,
+    :root:not([data-motion="force"]) [data-theme^="poe"] .parallax-sprite {
+        transition: none !important;
+    }
+
+    /* Still apply the transforms without animation, but only when not forcing */
+    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-far-back {
+        transform: translateZ(200px) !important;
+    }
+
+    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-back {
+        transform: translateZ(300px) !important;
+    }
+
+    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-mid {
+        transform: translateZ(400px) !important;
+    }
+
+    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-front {
+        transform: translateZ(600px) !important;
+    }
 }
