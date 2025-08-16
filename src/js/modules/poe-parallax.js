@@ -87,7 +87,15 @@ export function initPoeParallax() {
     // Wire up sprite loading with fallbacks
     wireParallaxSprites();
 
-    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // Tag sun's parent with has-sun class for CSS (avoids expensive :has selector)
+    document.querySelectorAll('.sun-element').forEach((sun) => {
+        const parent = sun.closest('.parallax-far-back');
+        if (parent) parent.classList.add('has-sun');
+    });
+
+    // Force animations even with reduced motion enabled
+    document.documentElement.setAttribute('data-motion', 'force');
+    
     const coarse = window.matchMedia('(pointer: coarse)').matches;
 
     const MAX_X = 12;
@@ -97,7 +105,7 @@ export function initPoeParallax() {
     let tx = 0, ty = 0;        // target
     let lastClientX = window.innerWidth / 2;
     let lastClientY = window.innerHeight / 2;
-    let running = !mql.matches;
+    let running = true;  // Always run, ignore reduced motion
     // pointer influence ramps 0→1 to prevent initial jump
     let influence = 0;
     let influenceTarget = 0;   // 0 at load; set to 1 after first input
@@ -129,21 +137,15 @@ export function initPoeParallax() {
 
     const apply = () => {
         const sy = window.scrollY || 0;
-        const isZooming = document.documentElement.classList.contains('is-zooming');
-        const isSettling = document.documentElement.classList.contains('zoom-settling');
+        const isAnimating = document.documentElement.classList.contains('animating');
         
-        if (isZooming || isSettling) {
-            // Reset all parallax values during zoom to prevent jump
-            layers.forEach(el => {
-                el.style.setProperty('--dx', '0px');
-                el.style.setProperty('--dy', '0px');
-                el.style.setProperty('--sy', '0px');
-            });
+        // Skip entirely during zoom animation - values already set in zoom:start
+        if (isAnimating) {
             return;
         }
         
         // Reduce parallax when zoomed in for subtle movement
-        const isZoomed = document.documentElement.classList.contains('zoomed-in');
+        const isZoomed = document.documentElement.classList.contains('zoomed');
         const zoomDamping = isZoomed ? 0.5 : 1;
         
         layers.forEach((el, i) => {
@@ -169,9 +171,8 @@ export function initPoeParallax() {
 
     const tick = () => {
         if (!running) return;
-        // Skip updates during zoom animation AND settling
-        if (document.documentElement.classList.contains('is-zooming') ||
-            document.documentElement.classList.contains('zoom-settling')) {
+        // Skip updates during zoom animation
+        if (document.documentElement.classList.contains('animating')) {
             // Reset to neutral during zoom
             mx = 0;
             my = 0;
@@ -181,7 +182,7 @@ export function initPoeParallax() {
             return;
         }
         // Use slower smoothing when zoomed in
-        const isZoomed = document.documentElement.classList.contains('zoomed-in');
+        const isZoomed = document.documentElement.classList.contains('zoomed');
         const k = isZoomed ? 0.03 : 0.06;    // position smoothing - extra slow when zoomed
         const r = 0.02;    // influence ramp smoothing - extra slow for smooth resume after zoom
         mx += (tx - mx) * k;
@@ -193,11 +194,10 @@ export function initPoeParallax() {
     window.requestAnimationFrame(tick);
 
     const onPointer = e => {
-        if (mql.matches) return;
         lastClientX = e.clientX;
         lastClientY = e.clientY;
         // Skip only during zoom animation, allow when zoomed in
-        if (document.documentElement.classList.contains('is-zooming')) return;
+        if (document.documentElement.classList.contains('animating')) return;
         influenceTarget = 1;
         setTargetsFromLastPointer();
     };
@@ -208,16 +208,15 @@ export function initPoeParallax() {
     };
 
     const onVisibility = () => {
-        running = !document.hidden && !mql.matches;
+        running = !document.hidden;  // Ignore reduced motion
         if (running) {
             window.requestAnimationFrame(tick);
         }
     };
 
-    const onMqlChange = () => onVisibility();
 
     const onMotion = e => {
-        if (mql.matches || !coarse) return;
+        if (!coarse) return;  // Ignore reduced motion, only check for touch device
         const gx = e.gamma ?? 0;
         const gy = e.beta ?? 0;
         
@@ -235,8 +234,14 @@ export function initPoeParallax() {
 
     // Listen for zoom events to sync values
     document.documentElement.addEventListener('zoom:start', () => {
-        // freeze influence immediately, and keep applying 0 deltas
+        // freeze influence immediately and reset CSS variables once
         influenceTarget = 0;
+        // Set to 0 once at start instead of every frame
+        layers.forEach(el => {
+            el.style.setProperty('--dx', '0px');
+            el.style.setProperty('--dy', '0px');
+            el.style.setProperty('--sy', '0px');
+        });
     });
     
     document.documentElement.addEventListener('zoom:end', () => {
@@ -258,11 +263,6 @@ export function initPoeParallax() {
     window.addEventListener('scroll', apply, opts); // recompute on scroll
     document.addEventListener('visibilitychange', onVisibility, { signal: ctrl.signal });
 
-    if (mql.addEventListener) {
-        mql.addEventListener('change', onMqlChange, { signal: ctrl.signal });
-    } else if (mql.addListener) {
-        mql.addListener(onMqlChange);
-    }
 
     if ('DeviceOrientationEvent' in window) {
         window.addEventListener('deviceorientation', onMotion, opts);
@@ -293,11 +293,6 @@ export function initPoeParallax() {
 
     return () => {
         ctrl.abort();
-        if (mql.removeEventListener) {
-            mql.removeEventListener('change', onMqlChange);
-        } else if (mql.removeListener) {
-            mql.removeListener(onMqlChange);
-        }
         // Reset layer offsets on cleanup
         layers.forEach(el => {
             el.style.setProperty('--dx', '0px');
