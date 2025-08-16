@@ -10,9 +10,8 @@
   perspective-origin: center center;
 }
 
-/* Smooth transitions for camera - always active during zoom states */
-[data-theme^="poe"].is-zooming .parallax-layer,
-[data-theme^="poe"].zoomed-in .parallax-layer {
+/* Smooth transitions for camera - only during zoom animation */
+[data-theme^="poe"].is-zooming .parallax-layer {
   transition: transform var(--scene-zoom-ms) cubic-bezier(0.4,0,0.2,1) !important;
 }
 
@@ -43,25 +42,25 @@
   outline-offset: 2px;
 }
 
-/* Camera dolly: direct transform overrides during zoom - NO parallax vars */
+/* Camera dolly: include parallax vars for movement when zoomed */
 [data-theme^="poe"].zoomed-in .parallax-far-back {
-  transform: translate3d(0, 0, 200px) !important;
+  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 200px) !important;
 }
 /* Sun stays fixed in place during zoom */
 [data-theme^="poe"].zoomed-in .parallax-far-back:has(.sun-element) {
-  transform: translate3d(0, 0, 0) !important;
+  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 0) !important;
 }
 [data-theme^="poe"].zoomed-in .sun-element {
   transform: translate(50%, -50%) scale(1.1) !important;
 }
 [data-theme^="poe"].zoomed-in .parallax-back {
-  transform: translate3d(0, 0, 300px) !important;
+  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 300px) !important;
 }
 [data-theme^="poe"].zoomed-in .parallax-mid {
-  transform: translate3d(0, 0, 400px) !important;
+  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 400px) !important;
 }
 [data-theme^="poe"].zoomed-in .parallax-front {
-  transform: translate3d(0, 0, 600px) !important;
+  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 600px) !important;
 }
 
 /* Trees slide out - these need transitions */

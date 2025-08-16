@@ -92,6 +92,7 @@ export function initPoeParallax() {
 
     const MAX_X = 12;
     const MAX_Y = 10;
+    const DEAD_ZONE = 0.08;    // 8% dead zone from center (16% total diameter)
     let mx = 0, my = 0;        // current
     let tx = 0, ty = 0;        // target
     let lastClientX = window.innerWidth / 2;
@@ -101,11 +102,29 @@ export function initPoeParallax() {
     let influence = 0;
     let influenceTarget = 0;   // 0 at load; set to 1 after first input
     
+    // Apply dead zone with smooth transition
+    const applyDeadZone = (value, deadZone) => {
+        const abs = Math.abs(value);
+        if (abs < deadZone) {
+            // Inside dead zone - smooth quadratic ease to 0
+            return value * Math.pow(abs / deadZone, 2);
+        }
+        // Outside dead zone - remap to full range
+        const sign = value < 0 ? -1 : 1;
+        const remapped = (abs - deadZone) / (0.5 - deadZone) * 0.5;
+        return sign * remapped;
+    };
+    
     const setTargetsFromLastPointer = () => {
+        // Normalize to -0.5 to 0.5 range
         const nx = lastClientX / window.innerWidth - 0.5;
         const ny = lastClientY / window.innerHeight - 0.5;
-        tx = nx * MAX_X;
-        ty = ny * MAX_Y;
+        
+        const dx = applyDeadZone(nx, DEAD_ZONE);
+        const dy = applyDeadZone(ny, DEAD_ZONE);
+        
+        tx = dx * MAX_X;
+        ty = dy * MAX_Y;
     };
 
     const apply = () => {
@@ -123,13 +142,28 @@ export function initPoeParallax() {
             return;
         }
         
-        const freeze = document.documentElement.classList.contains('zoomed-in') ? 0 : 1;
-        layers.forEach(el => {
-            const s = parseFloat(el.dataset.speed || '0') * freeze * influence; // Apply influence for smooth ramp
-            const sc = parseFloat(el.dataset.scroll || '0') * freeze * influence;
-            el.style.setProperty('--dx', `${mx * s}px`);
-            el.style.setProperty('--dy', `${my * s}px`);
+        // Reduce parallax when zoomed in for subtle movement
+        const isZoomed = document.documentElement.classList.contains('zoomed-in');
+        const zoomDamping = isZoomed ? 0.5 : 1;
+        
+        layers.forEach((el, i) => {
+            const s = parseFloat(el.dataset.speed || '0') * zoomDamping * influence;
+            const sc = parseFloat(el.dataset.scroll || '0') * zoomDamping * influence;
+            const dx = mx * s;
+            const dy = my * s;
+            el.style.setProperty('--dx', `${dx}px`);
+            el.style.setProperty('--dy', `${dy}px`);
             el.style.setProperty('--sy', `${sy * sc}px`);
+            
+            // Debug all layers when zoomed
+            if (isZoomed && Math.abs(mx) > 1) {
+                console.log(`Layer ${i}:`, { 
+                    class: el.className,
+                    speed: el.dataset.speed, 
+                    dx: dx.toFixed(1), 
+                    dy: dy.toFixed(1) 
+                });
+            }
         });
     };
 
@@ -146,7 +180,9 @@ export function initPoeParallax() {
             window.requestAnimationFrame(tick);
             return;
         }
-        const k = 0.06;    // position smoothing - reduced for slower movement
+        // Use slower smoothing when zoomed in
+        const isZoomed = document.documentElement.classList.contains('zoomed-in');
+        const k = isZoomed ? 0.03 : 0.06;    // position smoothing - extra slow when zoomed
         const r = 0.02;    // influence ramp smoothing - extra slow for smooth resume after zoom
         mx += (tx - mx) * k;
         my += (ty - my) * k;
@@ -160,9 +196,8 @@ export function initPoeParallax() {
         if (mql.matches) return;
         lastClientX = e.clientX;
         lastClientY = e.clientY;
-        // During zoom, we *record* pointer but skip applying targets
-        if (document.documentElement.classList.contains('is-zooming') ||
-            document.documentElement.classList.contains('zoomed-in')) return;
+        // Skip only during zoom animation, allow when zoomed in
+        if (document.documentElement.classList.contains('is-zooming')) return;
         influenceTarget = 1;
         setTargetsFromLastPointer();
     };
@@ -185,9 +220,17 @@ export function initPoeParallax() {
         if (mql.matches || !coarse) return;
         const gx = e.gamma ?? 0;
         const gy = e.beta ?? 0;
+        
+        // Normalize device tilt to -0.5 to 0.5 range
+        const nx = Math.max(-0.5, Math.min(0.5, gx / 90));
+        const ny = Math.max(-0.5, Math.min(0.5, gy / 90));
+        
+        const dx = applyDeadZone(nx, DEAD_ZONE);
+        const dy = applyDeadZone(ny, DEAD_ZONE);
+        
         influenceTarget = 1;
-        tx = (gx / 45) * MAX_X;
-        ty = (gy / 45) * MAX_Y;
+        tx = dx * MAX_X;
+        ty = dy * MAX_Y;
     };
 
     // Listen for zoom events to sync values
