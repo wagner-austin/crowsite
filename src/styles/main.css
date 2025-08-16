@@ -1,23 +1,27 @@
+/* ============================================
+   Main Stylesheet - Import Structure
+   ============================================ */
+
+/* Base styles */
 @import url("base/variables.css");
 @import url("base/reset.css");
 @import url("base/compatibility.css");
 @import url("base/typography.css");
+@import url("base/base.css");
 
+/* Layout */
 @import url("layouts/grid.css");
-@import url("layouts/sections.css");
 
-@import url("components/nav.css");
-@import url("components/hero.css");
-@import url("components/terminal.css");
-@import url("components/buttons.css");
-@import url("components/cards.css");
-@import url("components/forms.css");
+/* Theme System - variables first, then theme styles */
+@import url("themes/poe-theme-system.css");
+@import url("themes/poe.css");
+@import url("themes/poe-animations.css");
+
+/* Minimal components - will add more as needed */
 @import url("components/effects.css");
 @import url("components/images.css");
 
-@import url("themes/cyberpunk.css");
-@import url("themes/synthwave.css");
-
+/* Container utility */
 .container {
     width: 100%;
     max-width: var(--container-max-width);
@@ -25,41 +29,7 @@
     padding: 0 var(--container-padding);
 }
 
-.scanlines {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: var(--z-index-scanlines);
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0, 255, 204, 0.03) 50%);
-    background-size: 100% 4px;
-    pointer-events: none;
-    animation: scanlines 8s linear infinite;
-}
-
-@keyframes scanlines {
-    0% {
-        background-position: 0 0;
-    }
-
-    100% {
-        background-position: 0 10px;
-    }
-}
-
-.noise {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: var(--z-index-noise);
-    width: 100%;
-    height: 100%;
-    opacity: 0.02;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgbnVtT2N0YXZlcz0iMTAiLz48ZmVDb2xvck1hdHJpeCB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDEgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==");
-    pointer-events: none;
-}
-
+/* Loading screen */
 .loading-screen {
     position: fixed;
     top: 0;
@@ -86,7 +56,7 @@
 .loader-text {
     display: block;
     margin-bottom: var(--spacing-lg);
-    color: var(--color-primary);
+    color: var(--color-text-primary);
     font-size: var(--font-size-xl);
     animation: pulse 1s infinite;
 }
@@ -107,13 +77,13 @@
     width: 200px;
     height: 4px;
     overflow: hidden;
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--color-text-primary);
     background: var(--color-bg-secondary);
 }
 
 .progress-fill {
     height: 100%;
-    background: var(--color-primary);
+    background: var(--color-text-primary);
     animation: progress 2s ease-in-out infinite;
 }
 
@@ -136,93 +106,8 @@
     padding-top: 80px;
 }
 
-.main-footer {
-    margin-top: var(--spacing-3xl);
-    padding: var(--spacing-2xl) 0;
-    border-top: 1px solid var(--color-primary);
-    background: var(--color-bg-secondary);
-}
-
-.footer-content {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--spacing-lg);
-}
-
-.footer-text {
-    color: var(--color-text-secondary);
-}
-
-.social-links {
-    display: flex;
-    gap: var(--spacing-lg);
-}
-
-.social-link {
-    color: var(--color-text-secondary);
-    transition: color var(--transition-fast);
-}
-
-.social-link:hover {
-    color: var(--color-primary);
-    text-shadow: 0 0 10px currentcolor;
-}
-
-.highlight {
-    color: var(--color-primary);
-    text-shadow: 0 0 10px currentcolor;
-}
-
-.matrix-rain {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.ascii-art {
-    color: var(--color-primary);
-    font-size: var(--font-size-sm);
-    line-height: 1.2;
-    text-shadow: 0 0 10px currentcolor;
-    animation: flicker 3s infinite;
-}
-
-@keyframes flicker {
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    5% {
-        opacity: 0.8;
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    15% {
-        opacity: 0.9;
-    }
-
-    20% {
-        opacity: 1;
-    }
-}
-
 @media (width <= 768px) {
     .main-content {
         padding-top: 60px;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
     }
 }
