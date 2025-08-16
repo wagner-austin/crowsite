@@ -5,11 +5,11 @@ export class Config {
     constructor() {
         this.logger = new Logger('Config');
         this.defaults = {
-            appName: 'DEV_TERMINAL',
+            appName: 'Portfolio',
             version: '1.0.0',
             debug: false,
             logLevel: 'info',
-            theme: 'cyberpunk',
+            theme: 'poe-light',
             soundEnabled: true,
             soundVolume: 0.5,
             animationsEnabled: true,
@@ -23,20 +23,11 @@ export class Config {
             apiEndpoint: '',
             apiKey: '',
             features: {
-                terminal: true,
                 animations: true,
                 sound: true,
                 themes: true,
                 particles: true,
                 easter_eggs: true,
-            },
-            terminal: {
-                historySize: 100,
-                prompt: '$',
-                welcomeMessage: 'Welcome to DEV_TERMINAL v1.0\\nType "help" for available commands',
-                commands: {
-                    custom: {},
-                },
             },
             performance: {
                 throttleScroll: 100,
