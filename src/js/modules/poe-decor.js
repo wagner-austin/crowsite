@@ -1,6 +1,5 @@
 /* eslint-env browser */
 
-const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
 const isPoeTheme = () => {
     const theme = document.documentElement.getAttribute('data-theme');
     return theme && theme.startsWith('poe');
@@ -64,7 +63,7 @@ function ensureParticles() {
 }
 
 function spawnCrow() {
-    if (mql.matches || !isPoeTheme() || document.hidden || !underCap('.crow', 1)) {
+    if (!isPoeTheme() || document.hidden || !underCap('.crow', 1)) {
         return;
     }
 
@@ -165,7 +164,7 @@ function physicsFall(el, { vx, vy }) {
 }
 
 function spawnFeather() {
-    if (mql.matches || !isPoeTheme() || document.hidden || !underCap('.feather', 8)) {
+    if (!isPoeTheme() || document.hidden || !underCap('.feather', 8)) {
         return;
     }
 
@@ -262,7 +261,7 @@ export function initPoeDecor() {
     const stopFeatherLoop = schedule(spawnFeather, FEATHER_MIN, FEATHER_MAX);
 
     const onVis = () => {
-        const paused = document.hidden || mql.matches || !isPoeTheme();
+        const paused = document.hidden || !isPoeTheme();
         document
             .querySelectorAll('.crow,.feather')
             .forEach(n => (n.style.animationPlayState = paused ? 'paused' : 'running'));
