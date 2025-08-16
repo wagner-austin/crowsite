@@ -10,16 +10,21 @@ import EventBus from './core/eventBus.js';
 import {
     // PERFORMANCE as PERF_CONSTANTS, // For future use
     // STORAGE_KEYS, // For future use
-    SUCCESS_MESSAGES,
+    // SUCCESS_MESSAGES, // For future use
     TIMING,
 } from './core/constants.js';
-import { Terminal } from './modules/terminal.js';
+// Terminal module removed - not needed for minimal setup
 import { Animations } from './modules/animations.js';
 import { ThemeManager } from './modules/theme.js';
-import { AudioManager } from './modules/audio.js';
+// AudioManager removed for now - can be added back later
+// import { AudioManager } from './modules/audio.js';
 import ImageLoader from './modules/imageLoader.js';
 import { DOM } from './utils/dom.js';
-import { debounce, formatNumber, throttle } from './utils/helpers.js';
+import { debounce, throttle } from './utils/helpers.js';
+import { enablePoeTheme } from './modules/theme-poe.js';
+import { initPoeParallax } from './modules/poe-parallax.js';
+import { initPoeDecor } from './modules/poe-decor.js';
+import { initSceneAnimations } from './modules/scene-animations.js';
 
 class App {
     constructor() {
@@ -66,6 +71,44 @@ class App {
         }
     }
 
+    initializePoeTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+
+        // Clean up function for Poe theme modules
+        if (this.poeCleanup) {
+            this.poeCleanup();
+            this.poeCleanup = null;
+        }
+
+        // Initialize Poe theme modules if active (works for both poe-light and poe-dark)
+        if (currentTheme && currentTheme.startsWith('poe')) {
+            enablePoeTheme();
+            const stopParallax = initPoeParallax();
+            const stopDecor = initPoeDecor();
+            this.poeCleanup = () => {
+                stopParallax?.();
+                stopDecor?.();
+            };
+            this.logger.info('Poe theme modules initialized for:', currentTheme);
+        }
+    }
+
+    observeThemeChanges() {
+        // Observe theme changes for dynamic Poe theme initialization
+        const observer = new MutationObserver(records => {
+            for (const record of records) {
+                if (record.type === 'attributes' && record.attributeName === 'data-theme') {
+                    this.initializePoeTheme();
+                }
+            }
+        });
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+        this.themeObserver = observer;
+    }
+
     async init() {
         try {
             this.logger.group('Application Initialization');
@@ -110,10 +153,7 @@ class App {
         this.logger.info('Initializing modules...');
 
         try {
-            // Initialize terminal with error handling
-            this.terminal = new Terminal('#terminal-output', '#terminal-input');
-            this.terminal.init();
-            this.modules.terminal = this.terminal;
+            // Terminal removed - clean slate for new content
 
             // Initialize animations based on performance
             if (this.config.get('animations') !== false) {
@@ -127,12 +167,19 @@ class App {
             this.themeManager.init();
             this.modules.themeManager = this.themeManager;
 
-            // Initialize audio if supported and enabled
-            if (this.compatibility.features.webAudio && this.config.get('soundEnabled')) {
-                this.audioManager = new AudioManager();
-                this.audioManager.init();
-                this.modules.audioManager = this.audioManager;
-            }
+            // Initialize Poe theme if active
+            this.initializePoeTheme();
+
+            // Subscribe to theme changes from ThemeManager
+            this.themeManager.observe(() => this.initializePoeTheme());
+
+            // Start watching for theme changes
+            this.observeThemeChanges();
+
+            // Click-to-zoom scene animations
+            this.sceneAnimationsCleanup = initSceneAnimations();
+
+            // Audio manager removed for now - can be added back later
 
             // Initialize image loader
             if (this.compatibility.features.intersectionObserver) {
@@ -151,24 +198,8 @@ class App {
     attachEventListeners() {
         this.logger.info('Attaching event listeners...');
 
-        DOM.on('.nav-link', 'click', this.handleNavClick.bind(this));
-
-        DOM.on('.btn-primary', 'click', () => {
-            this.audioManager.play('click');
-            this.animations.glitch('.hero-title');
-        });
-
-        DOM.on('.theme-toggle', 'click', () => {
-            this.themeManager.toggleTheme();
-            this.audioManager.play('switch');
-        });
-
-        DOM.on('.sound-toggle', 'click', () => {
-            this.audioManager.toggle();
-            DOM.toggleClass('.sound-toggle', 'sound-muted');
-        });
-
-        DOM.on('#contact-form', 'submit', this.handleContactSubmit.bind(this));
+        // Event listeners removed for sections that no longer exist
+        // Clean slate for new interactive elements
 
         const handleScroll = throttle(() => {
             this.handleScrollEffects();
@@ -196,202 +227,22 @@ class App {
     initializeComponents() {
         this.logger.info('Initializing components...');
 
-        this.initializeStats();
-        this.initializeProjects();
-        this.initializeSkills();
-        this.initializeMatrixRain();
+        // Sections removed - clean slate for new content
+        this.logger.info('Ready for new content implementation');
+
+        // Matrix rain removed - not needed in minimalist theme
 
         this.logger.success('Components initialized');
     }
 
-    initializeStats() {
-        const stats = DOM.selectAll('.stat-number');
-        stats.forEach(stat => {
-            const target = parseInt(stat.dataset.count, 10);
-            this.animateNumber(stat, target);
-        });
-    }
+    // Section initialization methods removed - clean slate for new content
 
-    animateNumber(element, target) {
-        let current = 0;
-        const increment = target / TIMING.NUMBER_ANIMATION_INCREMENT_DIVISOR;
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
-            }
-            element.textContent = formatNumber(Math.floor(current));
-        }, TIMING.NUMBER_ANIMATION_STEP);
-    }
+    // Matrix rain removed - not used in minimalist theme
 
-    initializeProjects() {
-        const projectsData = [
-            {
-                title: 'Neural Network Visualizer',
-                description: 'Interactive 3D visualization of neural networks',
-                image: 'https://via.placeholder.com/400x200',
-                tags: ['JavaScript', 'WebGL', 'AI'],
-                link: '#',
-            },
-            {
-                title: 'Quantum Computing Sim',
-                description: 'Browser-based quantum computer simulator',
-                image: 'https://via.placeholder.com/400x200',
-                tags: ['TypeScript', 'React', 'Quantum'],
-                link: '#',
-            },
-            {
-                title: 'Blockchain Explorer',
-                description: 'Real-time blockchain transaction explorer',
-                image: 'https://via.placeholder.com/400x200',
-                tags: ['Node.js', 'Web3', 'MongoDB'],
-                link: '#',
-            },
-        ];
-
-        const container = DOM.select('#projects-grid');
-        if (container) {
-            projectsData.forEach(project => {
-                const card = this.createProjectCard(project);
-                container.appendChild(card);
-            });
-        }
-    }
-
-    createProjectCard(project) {
-        const card = DOM.create('div', 'card project-card fade-in');
-        card.innerHTML = `
-            <img src="${project.image}" alt="${project.title}" class="project-image">
-            <div class="card-header">
-                <h3 class="card-title">${project.title}</h3>
-            </div>
-            <div class="card-body">
-                <p>${project.description}</p>
-                <div class="project-tags">
-                    ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="${project.link}" class="btn btn-sm btn-secondary">VIEW PROJECT</a>
-            </div>
-        `;
-        return card;
-    }
-
-    initializeSkills() {
-        const skillsData = [
-            { name: 'JavaScript', level: 95, icon: '⚡' },
-            { name: 'TypeScript', level: 90, icon: '🔷' },
-            { name: 'React', level: 85, icon: '⚛️' },
-            { name: 'Node.js', level: 88, icon: '🟢' },
-            { name: 'Python', level: 80, icon: '🐍' },
-            { name: 'Rust', level: 70, icon: '🦀' },
-        ];
-
-        const container = DOM.select('#skills-grid');
-        if (container) {
-            skillsData.forEach(skill => {
-                const card = this.createSkillCard(skill);
-                container.appendChild(card);
-            });
-        }
-    }
-
-    createSkillCard(skill) {
-        const card = DOM.create('div', 'card skill-card zoom-in');
-        card.innerHTML = `
-            <div class="skill-icon">${skill.icon}</div>
-            <div class="skill-name">${skill.name}</div>
-            <div class="skill-level">
-                <div class="skill-bar">
-                    <div class="skill-progress" style="width: ${skill.level}%"></div>
-                </div>
-                <span class="text-sm text-muted">${skill.level}%</span>
-            </div>
-        `;
-        return card;
-    }
-
-    initializeMatrixRain() {
-        const canvas = DOM.create('canvas');
-        const matrixContainer = DOM.select('.matrix-rain');
-        if (!matrixContainer) {
-            return;
-        }
-
-        matrixContainer.appendChild(canvas);
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = matrixContainer.offsetWidth;
-        canvas.height = matrixContainer.offsetHeight;
-
-        const matrix = '01';
-        const matrixArray = matrix.split('');
-        const fontSize = 10;
-        const columns = canvas.width / fontSize;
-        const drops = [];
-
-        for (let i = 0; i < columns; i++) {
-            drops[i] = 1;
-        }
-
-        const drawMatrix = () => {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#00ff41';
-            ctx.font = `${fontSize}px monospace`;
-
-            for (let i = 0; i < drops.length; i++) {
-                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i] += 1;
-            }
-        };
-
-        setInterval(drawMatrix, TIMING.MATRIX_RAIN_INTERVAL);
-    }
-
-    handleNavClick(event) {
-        event.preventDefault();
-        const target = event.target.getAttribute('href');
-        const section = DOM.select(target);
-
-        if (section) {
-            this.audioManager.play('nav');
-            section.scrollIntoView({ behavior: 'smooth' });
-
-            DOM.removeClass('.nav-link', 'active');
-            event.target.classList.add('active');
-        }
-    }
-
-    handleContactSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData);
-
-        this.logger.info('Contact form submitted', data);
-        this.audioManager.play('success');
-
-        this.terminal.addLine(SUCCESS_MESSAGES.MESSAGE_SENT, 'success');
-        event.target.reset();
-    }
+    // Navigation and form handlers removed - clean slate for new interactions
 
     handleScrollEffects() {
-        const { scrollY } = window;
-        const header = DOM.select('.main-header');
-
-        if (scrollY > 100) {
-            DOM.addClass(header, 'scrolled');
-        } else {
-            DOM.removeClass(header, 'scrolled');
-        }
+        // Scroll effects placeholder - will add new effects here
 
         const elements = DOM.selectAll('.fade-in, .slide-up, .zoom-in');
         elements.forEach(element => {
@@ -450,9 +301,8 @@ class App {
             },
         });
 
-        // Display error to user
-        const errorMessage = `ERROR: ${errorInfo.userMessage || error.message}`;
-        this.terminal?.addLine(errorMessage, 'error');
+        // Display error to user (terminal removed, using console for now)
+        console.error(`ERROR: ${errorInfo.userMessage || error.message}`);
 
         // Emit error event
         EventBus.emit('app:error', errorInfo);
