@@ -1,11 +1,12 @@
 {
   "name": "retro-dev-portfolio",
   "version": "1.0.0",
-  "description": "A cyberpunk-themed retro-futuristic developer portfolio",
+  "description": "A minimalist developer portfolio with parallax effects",
   "main": "src/js/main.js",
   "type": "module",
   "scripts": {
-    "dev": "npx serve -l 3000",
+    "dev": "npx serve -l 3000 --no-clipboard",
+    "dev:network": "npx serve -l 3000 -n --no-clipboard",
     "build": "npm run lint && npm run format:check",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
     "lint:js": "eslint 'src/**/*.js' --fix",
@@ -27,8 +28,9 @@
     "portfolio",
     "web",
     "frontend",
-    "cyberpunk",
-    "retro",
+    "minimalist",
+    "parallax",
+    "portfolio",
     "terminal"
   ],
   "author": "Developer",
