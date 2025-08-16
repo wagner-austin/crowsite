@@ -51,8 +51,7 @@ export class ImageManager {
             // Setup responsive images
             this.setupResponsiveImages();
 
-            // Setup retro effects
-            this.setupRetroEffects();
+            // No retro effects needed for Poe theme
 
             // Preload critical images
             await this.preloadCriticalImages();
@@ -238,7 +237,6 @@ export class ImageManager {
                     alt: 'Developer Profile',
                     loading: 'eager',
                     display: true,
-                    effects: ['glitch', 'scanlines'],
                 },
             },
             logos: {
@@ -262,7 +260,6 @@ export class ImageManager {
                     position: 'center center',
                     size: 'cover',
                     attachment: 'fixed',
-                    effects: ['parallax', 'noise'],
                     enabled: true,
                 },
                 sections: {
@@ -410,10 +407,7 @@ export class ImageManager {
             // Apply image with transition
             this.applyImage(element, img);
 
-            // Apply effects if specified
-            if (effect) {
-                this.applyEffect(element, effect);
-            }
+            // Effects no longer supported in Poe theme
 
             this.logger.debug('Image loaded', { src, element: element.id || element.className });
         } catch (error) {
@@ -521,169 +515,6 @@ export class ImageManager {
         }
     }
 
-    /**
-     * Setup retro effects
-     */
-    setupRetroEffects() {
-        // CRT scanlines effect
-        this.setupScanlines();
-
-        // Glitch effect
-        this.setupGlitchEffect();
-
-        // VHS distortion
-        this.setupVHSEffect();
-
-        // Pixel art scaling
-        this.setupPixelArt();
-    }
-
-    /**
-     * Apply retro effect to element
-     */
-    applyEffect(element, effect) {
-        switch (effect) {
-            case 'glitch':
-                this.applyGlitchEffect(element);
-                break;
-            case 'scanlines':
-                this.applyScanlines(element);
-                break;
-            case 'vhs':
-                this.applyVHSEffect(element);
-                break;
-            case 'pixel':
-                this.applyPixelEffect(element);
-                break;
-            case 'crt':
-                this.applyCRTEffect(element);
-                break;
-            default:
-                this.logger.warn('Unknown effect', effect);
-        }
-    }
-
-    /**
-     * Setup scanlines overlay
-     */
-    setupScanlines() {
-        const style = document.createElement('style');
-        style.textContent = `
-            .scanlines::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                background: linear-gradient(
-                    to bottom,
-                    transparent 50%,
-                    rgba(0, 255, 204, 0.03) 50%
-                );
-                background-size: 100% 4px;
-                animation: scanlines 8s linear infinite;
-                z-index: 1;
-            }
-            
-            @keyframes scanlines {
-                0% { background-position: 0 0; }
-                100% { background-position: 0 10px; }
-            }
-            
-            /* Safari/iOS optimization */
-            @supports (-webkit-touch-callout: none) {
-                .scanlines::after {
-                    will-change: background-position;
-                    -webkit-transform: translateZ(0);
-                    transform: translateZ(0);
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    /**
-     * Apply glitch effect
-     */
-    applyGlitchEffect(element) {
-        element.classList.add('glitch-image');
-
-        // Random glitch intervals
-        setInterval(() => {
-            if (Math.random() > 0.95) {
-                element.classList.add('glitching');
-                setTimeout(() => {
-                    element.classList.remove('glitching');
-                }, 200);
-            }
-        }, 3000);
-    }
-
-    /**
-     * Setup VHS effect
-     */
-    setupVHSEffect() {
-        const style = document.createElement('style');
-        style.textContent = `
-            .vhs-effect {
-                position: relative;
-                filter: contrast(1.2) saturate(1.5);
-            }
-            
-            .vhs-effect::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: repeating-linear-gradient(
-                    to bottom,
-                    rgba(255, 0, 0, 0.03),
-                    rgba(0, 255, 0, 0.02),
-                    rgba(0, 0, 255, 0.03)
-                );
-                background-size: 100% 3px;
-                pointer-events: none;
-                mix-blend-mode: color-dodge;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    /**
-     * Setup pixel art rendering
-     */
-    setupPixelArt() {
-        const style = document.createElement('style');
-        style.textContent = `
-            .pixel-art {
-                image-rendering: -moz-crisp-edges;
-                image-rendering: -webkit-crisp-edges;
-                image-rendering: pixelated;
-                image-rendering: crisp-edges;
-                -ms-interpolation-mode: nearest-neighbor;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    /**
-     * Apply CRT effect with WebGL if available
-     */
-    applyCRTEffect(element) {
-        if (!this.supports.webGL) {
-            // Fallback to CSS filters
-            element.style.filter = 'contrast(1.1) brightness(1.05) saturate(1.2)';
-            element.classList.add('scanlines');
-            return;
-        }
-
-        // WebGL CRT shader would go here
-        this.logger.info('WebGL CRT effect applied');
-    }
 
     /**
      * Preload critical images
