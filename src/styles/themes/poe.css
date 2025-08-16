@@ -1,0 +1,441 @@
+/* ============================================
+   Poe Theme - Layout and Structure
+   ============================================ */
+
+/* 
+   This file defines the STRUCTURE for the Poe theme.
+   Colors and filters come from poe-theme-system.css
+*/
+
+/* --- Shared z-index stacking order --- */
+[data-theme^="poe"] {
+    --z-header: 2000;
+    --z-content: 200;
+    --z-crow: 140;
+    --z-foreground: 120;
+    --z-mid: 110;
+    --z-back: 100;
+    --z-overlay: 10;
+}
+
+/* --- Shared typography --- */
+[data-theme^="poe"] {
+    --font-family-primary: "Crimson Text", "Baskerville", "Georgia", serif;
+    --font-family-display: "Playfair Display", "Didot", "Georgia", serif;
+    --font-family-code: "Courier Prime", "Courier New", monospace;
+}
+
+/* ============================================
+   Base styles using CSS variables
+   ============================================ */
+
+/* Legacy elements hidden - can be removed if HTML doesn't have these classes */
+
+/* Body background */
+[data-theme^="poe"] body {
+    position: relative;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+}
+
+/* Subtle texture overlay */
+[data-theme^="poe"] body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-overlay);
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    background: var(--overlay-gradient);
+    pointer-events: none;
+}
+
+/* Header styling */
+[data-theme^="poe"] .main-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    border-bottom: 1px solid var(--nav-border);
+    background: var(--nav-bg);
+    color: var(--nav-text);
+    backdrop-filter: saturate(110%) blur(3px);
+}
+
+[data-theme^="poe"] .main-header a,
+[data-theme^="poe"] .main-header .nav-link {
+    color: var(--nav-text);
+}
+
+[data-theme^="poe"] .main-header .nav-link:hover,
+[data-theme^="poe"] .main-header .nav-link.active {
+    color: var(--color-text-secondary);
+}
+
+/* Content positioning */
+[data-theme^="poe"] main,
+[data-theme^="poe"] .site-content {
+    position: relative;
+    z-index: var(--z-content);
+}
+
+/* ============================================
+   Parallax Container & Layers
+   ============================================ */
+
+[data-theme^="poe"] .parallax-container {
+    position: fixed;
+    z-index: var(--z-back);
+    width: 100%;
+    height: 100vh;
+    pointer-events: none;
+    inset: 0;
+    perspective: 1000px;
+}
+
+[data-theme^="poe"] .parallax-layer {
+    --dx: 0;
+    --dy: 0;
+    --sy: 0;
+
+    position: absolute;
+    inset: -10%;
+    width: 120%;
+    height: 120%;
+    will-change: transform;
+    transform: translate3d(var(--dx), calc(var(--dy) + var(--sy)), 0);
+}
+
+[data-theme^="poe"] .parallax-back {
+    z-index: var(--z-back);
+}
+
+[data-theme^="poe"] .parallax-mid {
+    z-index: var(--z-mid);
+}
+
+[data-theme^="poe"] .parallax-front {
+    z-index: var(--z-foreground);
+}
+
+/* ============================================
+   Parallax Sprites
+   ============================================ */
+
+[data-theme^="poe"] .parallax-sprite {
+    position: absolute;
+    max-width: none;
+    opacity: 1;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* Sprite positioning classes */
+[data-theme^="poe"] .parallax-sprite.cover {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+[data-theme^="poe"] .parallax-sprite.contain {
+    max-height: 100%;
+    object-fit: contain;
+}
+
+[data-theme^="poe"] .parallax-sprite.align-bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+[data-theme^="poe"] .parallax-sprite.align-top-right {
+    top: 0;
+    right: 0;
+    max-width: 70vw;
+}
+
+/* Loading states */
+[data-theme^="poe"] .parallax-sprite.is-loading {
+    opacity: 0;
+}
+
+[data-theme^="poe"] .parallax-sprite.is-error {
+    display: none;
+    opacity: 0;
+}
+
+/* ============================================
+   Crow & Feather Elements
+   ============================================ */
+
+[data-theme^="poe"] .crow,
+[data-theme^="poe"] .feather {
+    position: fixed;
+    z-index: var(--z-crow);
+    pointer-events: none;
+    will-change: transform, left, top;
+    transition: filter 0.5s ease;
+}
+
+[data-theme^="poe"] .crow {
+    width: 45px;
+    height: auto;
+    filter: var(--filter-crow) drop-shadow(0 4px 8px var(--shadow-color));
+}
+
+[data-theme^="poe"] .feather {
+    width: 50px;
+    height: auto;
+    opacity: 0.7;
+    filter: var(--filter-feathers) drop-shadow(0 2px 4px var(--shadow-color));
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fly-across {
+    from {
+        left: -15vw;
+    }
+
+    to {
+        left: 115vw;
+    }
+}
+
+/* Feather animations removed - using physics-based JS instead */
+
+/* ============================================
+   Typography Effects
+   ============================================ */
+
+[data-theme^="poe"] .typewriter-poe {
+    overflow: hidden;
+    border-right: 2px solid currentcolor;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    animation:
+        typing-poe 3.5s steps(40, end),
+        blink-caret 0.8s step-end infinite;
+}
+
+@keyframes typing-poe {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes blink-caret {
+    50% {
+        border-color: transparent;
+    }
+}
+
+/* ============================================
+   Text Styles
+   ============================================ */
+
+[data-theme^="poe"] h1,
+[data-theme^="poe"] h2,
+[data-theme^="poe"] h3 {
+    font-family: var(--font-family-display);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+[data-theme^="poe"] .section-title {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+}
+
+[data-theme^="poe"] .section-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-text-primary), transparent);
+}
+
+/* ============================================
+   Fade-in Animation
+   ============================================ */
+
+[data-theme^="poe"] .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme^="poe"] .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   Reduced Motion Support
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme^="poe"] .crow,
+    [data-theme^="poe"] .feather,
+    [data-theme^="poe"] .particle,
+    [data-theme^="poe"] .typewriter-poe,
+    [data-theme^="poe"] .fade-in,
+    [data-theme^="poe"]:not(.is-zooming) .parallax-layer {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    [data-theme^="poe"]:not(.is-zooming):not(.zoomed-in) .parallax-layer {
+        transform: none !important;
+    }
+}
+
+/* ============================================
+   Positioned Elements - Responsive
+   ============================================ */
+
+/* Sun element */
+[data-theme^="poe"] .sun-element {
+    position: absolute;
+    top: 20%;
+    right: 30%;
+    transform: translate(50%, -50%);
+    width: min(18vw, 180px);
+    height: auto;
+}
+
+/* Town background */
+[data-theme^="poe"] .town-background {
+    position: absolute;
+    bottom: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45vw;
+    max-width: 650px;
+    height: auto;
+}
+
+/* Mid layer elements */
+[data-theme^="poe"] .tree-left {
+    position: absolute;
+    bottom: 0;
+    left: 2%;
+    height: 80vh;
+    max-height: 80%;
+    width: auto;
+}
+
+[data-theme^="poe"] .shack-right {
+    position: absolute;
+    bottom: 0;
+    right: 20%;
+    height: 50vh;
+    max-height: 50%;
+    width: auto;
+}
+
+[data-theme^="poe"] .bush-center {
+    position: absolute;
+    bottom: 0;
+    left: 35%;
+    height: 30vh;
+    max-height: 30%;
+    width: auto;
+}
+
+/* Front layer elements */
+[data-theme^="poe"] .tree-close-right {
+    position: absolute;
+    top: 50%;
+    right: -2%;
+    transform: translateY(-50%);
+    height: 110vh;
+    max-height: 110%;
+    width: auto;
+}
+
+[data-theme^="poe"] .tree-close-left {
+    position: absolute;
+    top: 50%;
+    left: -2%;
+    transform: translateY(-50%);
+    height: 110vh;
+    max-height: 110%;
+    width: auto;
+}
+
+[data-theme^="poe"] .fence-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 30%;
+    height: 25vh;
+    max-height: 25%;
+    width: auto;
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+
+@media (width <= 768px) {
+    [data-theme^="poe"] .crow {
+        width: 35px;
+    }
+
+    [data-theme^="poe"] .feather {
+        width: 30px;
+    }
+    
+    /* Adjust positioned elements for mobile */
+    [data-theme^="poe"] .sun-element {
+        width: 25vw;
+    }
+    
+    [data-theme^="poe"] .town-background {
+        width: 95vw;
+        bottom: 2%;
+    }
+    
+    [data-theme^="poe"] .tree-left {
+        height: 70vh;
+    }
+    
+    [data-theme^="poe"] .shack-right {
+        height: 40vh;
+        right: 10%;
+    }
+    
+    [data-theme^="poe"] .bush-center {
+        height: 20vh;
+    }
+    
+    [data-theme^="poe"] .tree-close-right,
+    [data-theme^="poe"] .tree-close-left {
+        height: 100vh;
+        transform: translateY(-50%);
+    }
+    
+    [data-theme^="poe"] .fence-bottom {
+        height: 15vh;
+    }
+}
+
+@media (width >= 1920px) {
+    /* Larger screens - cap sizes */
+    [data-theme^="poe"] .sun-element {
+        width: 250px;
+    }
+}
