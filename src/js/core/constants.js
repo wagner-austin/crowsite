@@ -18,14 +18,9 @@ export const TIMING = {
     LOADING_SCREEN_FADE_DURATION: 500,
     NUMBER_ANIMATION_STEP: 30,
     NUMBER_ANIMATION_INCREMENT_DIVISOR: 50,
-    MATRIX_RAIN_INTERVAL: 35,
-    GLITCH_DURATION: 200,
-    GLITCH_INTERVAL: 3000,
-    GLITCH_PROBABILITY: 0.95,
     TYPEWRITER_SPEED: 50,
     FPS_SAMPLE_INTERVAL: 1000,
     MEMORY_CHECK_INTERVAL: 5000,
-    TERMINAL_BLINK_INTERVAL: 500,
 };
 
 // Performance Thresholds
@@ -126,25 +121,12 @@ export const IMAGE = {
     EFFECT_OPACITY: 0.03,
 };
 
-// Terminal Configuration
-export const TERMINAL = {
-    MAX_HISTORY: 100,
-    MAX_OUTPUT_LINES: 500,
-    COMMAND_TIMEOUT: 5000,
-    TYPING_DELAY: 50,
-    AUTO_COMPLETE_DELAY: 100,
-    SCROLL_BUFFER: 1000,
-    DEFAULT_PROMPT: '$',
-    DEFAULT_USERNAME: 'guest',
-    DEFAULT_HOSTNAME: 'dev-terminal',
-};
-
 // Theme Configuration
 export const THEME = {
-    DEFAULT: 'cyberpunk',
+    DEFAULT: 'poe-light',
     STORAGE_KEY: 'theme-preference',
     TRANSITION_DURATION: 300,
-    AVAILABLE_THEMES: ['cyberpunk', 'synthwave', 'matrix', 'vaporwave'],
+    AVAILABLE_THEMES: ['poe-light', 'poe-dark'],
     AUTO_SAVE: true,
 };
 
@@ -154,7 +136,6 @@ export const STORAGE_KEYS = {
     SOUND_ENABLED: 'sound-enabled',
     PERFORMANCE_MODE: 'performance-mode',
     USER_PREFERENCES: 'user-preferences',
-    TERMINAL_HISTORY: 'terminal-history',
     DEBUG_ENABLED: 'debug-enabled',
     ANIMATION_ENABLED: 'animation-enabled',
 };
@@ -251,7 +232,6 @@ export default {
     BREAKPOINTS,
     Z_INDEX,
     IMAGE,
-    TERMINAL,
     THEME,
     STORAGE_KEYS,
     ERROR_MESSAGES,
