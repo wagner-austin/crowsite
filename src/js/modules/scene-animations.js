@@ -4,7 +4,8 @@ import EventBus from '../core/eventBus.js';
 export function initSceneAnimations({
   triggerSelector = '[data-zoom-trigger]',
   rootSelector = ':root',
-  parallaxPauseClass = 'zoomed-in',
+  parallaxPauseClass = 'zoomed',
+  ignoreReducedMotion = true,
 } = {}) {
   console.log('[SceneAnimations] Initializing with selector:', triggerSelector);
   
@@ -16,9 +17,12 @@ export function initSceneAnimations({
     return { destroy() {} };
   }
 
-  const mqlReduce = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  // Force animations even when OS has reduced motion enabled
+  if (ignoreReducedMotion) {
+    root.setAttribute('data-motion', 'force');
+  }
 
-  // Read CSS custom properties for timing (fallback to 1500/1200ms)
+  // Read CSS custom properties for timing (fallback to 2500/2000ms)
   const msFromVar = (name, fallback) => {
     const v = getComputedStyle(root).getPropertyValue(name).trim();
     if (!v) return fallback;
@@ -28,10 +32,9 @@ export function initSceneAnimations({
     const n = Number(v);
     return Number.isFinite(n) ? n : fallback;
   };
-  const baseIn  = msFromVar('--scene-zoom-ms',     1500);
-  const baseOut = msFromVar('--scene-zoom-out-ms', 1200);
-  const zoomInMs  = mqlReduce?.matches ? 0 : baseIn;
-  const zoomOutMs = mqlReduce?.matches ? 0 : baseOut;
+  // Always use full animation timing, ignore reduced motion preference
+  const zoomInMs  = msFromVar('--scene-zoom-ms',     2500);
+  const zoomOutMs = msFromVar('--scene-zoom-out-ms', 2000);
 
   let locked = false;
 
@@ -46,50 +49,56 @@ export function initSceneAnimations({
     console.log('[SceneAnimations] zoomIn called, locked:', locked);
     if (locked) return;
     locked = true;
-    root.classList.add('is-zooming');           // 1) enable transitions
+    root.classList.add('animating');           // 1) enable transitions
+    void root.getBoundingClientRect();         // arm transitions for Android
     document.documentElement.dispatchEvent(new CustomEvent('zoom:start'));
-    requestAnimationFrame(() => {                // 2) next frame, change state
-      console.log('[SceneAnimations] Adding class:', parallaxPauseClass);
-      root.classList.add(parallaxPauseClass);   // adds .zoomed-in
-      setPressed(true);
-      EventBus.emit('scene:zoom', { state: 'in' });
-      window.setTimeout(() => {
-        root.classList.remove('is-zooming');    // 3) clean up
-        root.classList.add('zoom-settling');    // Keep transitions active
-        document.documentElement.dispatchEvent(new CustomEvent('zoom:end', { detail: { direction: 'in' }}));
-        // Remove settling class after transition
+    // Add delay for mobile to prepare GPU acceleration
+    const isMobile = window.matchMedia('(max-width: 768px)').matches || 
+                     window.matchMedia('(pointer: coarse)').matches;
+    const prepDelay = isMobile ? 50 : 0;  // 50ms prep time for mobile
+    
+    window.setTimeout(() => {
+      requestAnimationFrame(() => {                // 2) next frame, change state
+        console.log('[SceneAnimations] Adding class:', parallaxPauseClass);
+        root.classList.add(parallaxPauseClass);   // adds .zoomed
+        setPressed(true);
+        EventBus.emit('scene:zoom', { state: 'in' });
         window.setTimeout(() => {
-          root.classList.remove('zoom-settling');
+          root.classList.remove('animating');    // 3) clean up
+          document.documentElement.dispatchEvent(new CustomEvent('zoom:end', { detail: { direction: 'in' }}));
           locked = false;
-        }, 500);
-        console.log('[SceneAnimations] Zoom in complete');
-      }, zoomInMs + 100);
-    });
+          console.log('[SceneAnimations] Zoom in complete');
+        }, zoomInMs + 100);
+      });
+    }, prepDelay);
   };
 
   const zoomOut = () => {
     console.log('[SceneAnimations] zoomOut called, locked:', locked);
     if (locked) return;
     locked = true;
-    root.classList.add('is-zooming');
+    root.classList.add('animating');
+    void root.getBoundingClientRect();         // arm transitions for Android
     document.documentElement.dispatchEvent(new CustomEvent('zoom:start'));
-    requestAnimationFrame(() => {
-      console.log('[SceneAnimations] Removing class:', parallaxPauseClass);
-      root.classList.remove(parallaxPauseClass); // removes .zoomed-in
-      setPressed(false);
-      EventBus.emit('scene:zoom', { state: 'out' });
-      window.setTimeout(() => {
-        root.classList.remove('is-zooming');
-        root.classList.add('zoom-settling');    // Keep transitions active
-        document.documentElement.dispatchEvent(new CustomEvent('zoom:end', { detail: { direction: 'out' }}));
-        // Remove settling class after transition
+    // Add delay for mobile to prepare GPU acceleration
+    const isMobile = window.matchMedia('(max-width: 768px)').matches || 
+                     window.matchMedia('(pointer: coarse)').matches;
+    const prepDelay = isMobile ? 50 : 0;  // 50ms prep time for mobile
+    
+    window.setTimeout(() => {
+      requestAnimationFrame(() => {
+        console.log('[SceneAnimations] Removing class:', parallaxPauseClass);
+        root.classList.remove(parallaxPauseClass); // removes .zoomed
+        setPressed(false);
+        EventBus.emit('scene:zoom', { state: 'out' });
         window.setTimeout(() => {
-          root.classList.remove('zoom-settling');
+          root.classList.remove('animating');
+          document.documentElement.dispatchEvent(new CustomEvent('zoom:end', { detail: { direction: 'out' }}));
           locked = false;
-        }, 500);
-        console.log('[SceneAnimations] Zoom out complete');
-      }, zoomOutMs + 100);
-    });
+          console.log('[SceneAnimations] Zoom out complete');
+        }, zoomOutMs + 100);
+      });
+    }, prepDelay);
   };
 
   const toggleZoom = () => {
@@ -174,7 +183,7 @@ export function initSceneAnimations({
       if (r.type === 'attributes' && r.attributeName === 'data-theme') {
         const th = root.getAttribute('data-theme') || '';
         if (!/^poe/.test(th)) {
-          root.classList.remove(parallaxPauseClass, 'is-zooming');
+          root.classList.remove(parallaxPauseClass, 'animating');
           setPressed(false);
         }
       }
