@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "retro-dev-portfolio"
+version = "1.0.0"
+description = "A cyberpunk-themed retro-futuristic developer portfolio"
+authors = ["Developer <developer@example.com>"]
+readme = "README.md"
+homepage = "https://github.com/yourusername/retro-dev-portfolio"
+repository = "https://github.com/yourusername/retro-dev-portfolio"
+keywords = ["portfolio", "web", "frontend", "cyberpunk", "retro"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.5.0"
+black = "^23.11.0"
+isort = "^5.12.0"
+flake8 = "^6.1.0"
+mypy = "^1.7.0"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+mkdocs = "^1.5.3"
+mkdocs-material = "^9.4.0"
+livereload = "^2.6.3"
+
+[tool.black]
+line-length = 100
+target-version = ['py39']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+no_implicit_optional = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers --cov=src --cov-report=term-missing"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,397 @@
+/**
+ * Browser Compatibility Styles
+ * Vendor prefixes and fallbacks for cross-browser support
+ */
+
+/* Flexbox with full vendor support */
+.flex,
+[class*="flex-"] {
+    display: -webkit-box;
+    display: flexbox;
+    display: flex;
+    display: flex;
+}
+
+.flex-row {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-direction: row;
+}
+
+.flex-column {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+}
+
+.flex-center {
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.flex-1 {
+    -webkit-box-flex: 1;
+    flex: 1;
+}
+
+/* Grid with fallback */
+@supports not (display: grid) {
+    .grid,
+    [class*="grid-"] {
+        display: -webkit-box;
+        display: flexbox;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .grid > *,
+    [class*="grid-"] > * {
+        -webkit-box-flex: 1;
+        flex: 1 1 300px;
+        margin: 0.5rem;
+    }
+}
+
+/* Transform with vendor prefixes */
+.transform {
+    transform: translateZ(0);
+}
+
+/* Transitions */
+.transition {
+    transition: all 0.3s ease;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Box-sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Appearance reset */
+button,
+input,
+select,
+textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Backdrop filter fallback */
+@supports not ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+    .backdrop-blur {
+        background-color: rgba(10, 10, 10, 0.95);
+    }
+}
+
+.backdrop-blur {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* User select */
+.no-select {
+    user-select: none;
+}
+
+.select-all {
+    user-select: all;
+}
+
+/* Touch action */
+.no-touch {
+    touch-action: none;
+}
+
+.touch-pan-x {
+    touch-action: pan-x;
+}
+
+.touch-pan-y {
+    touch-action: pan-y;
+}
+
+/* Pointer events */
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.pointer-events-auto {
+    pointer-events: auto;
+}
+
+/* Will-change for performance */
+.will-change-transform {
+    will-change: transform;
+}
+
+.will-change-opacity {
+    will-change: opacity;
+}
+
+/* Hardware acceleration */
+.hardware-accelerate {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Text rendering optimization */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizelegibility;
+}
+
+/* Focus visible polyfill */
+.js-focus-visible :focus:not(.focus-visible) {
+    outline: none;
+}
+
+/* Sticky positioning fallback */
+@supports not (position: sticky) {
+    .sticky {
+        position: fixed;
+        top: 0;
+    }
+}
+
+.sticky {
+    position: sticky;
+    top: 0;
+}
+
+/* Clip-path fallback */
+@supports not (clip-path: circle(50%)) {
+    .clip-circle {
+        overflow: hidden;
+        border-radius: 50%;
+    }
+}
+
+/* Object-fit fallback */
+@supports not (object-fit: cover) {
+    .object-cover {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: auto;
+        min-width: 100%;
+        height: auto;
+        min-height: 100%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.object-cover {
+    object-fit: cover;
+}
+
+/* Gap property fallback for flexbox */
+@supports not (gap: 1rem) {
+    .gap-4 > * + * {
+        margin-left: 1rem;
+    }
+}
+
+/* Custom scrollbar styles with vendor prefixes */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-background, #0a0a0a);
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: var(--color-primary, #00ffcc);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-hover, #00ccaa);
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary, #00ffcc) var(--color-background, #0a0a0a);
+}
+
+/* Selection styles */
+::selection {
+    background: var(--color-primary, #00ffcc);
+    color: var(--color-background, #0a0a0a);
+}
+
+::selection {
+    background: var(--color-primary, #00ffcc);
+    color: var(--color-background, #0a0a0a);
+}
+
+/* Placeholder styles */
+::input-placeholder {
+    opacity: 1;
+    color: var(--color-text-muted, #666666);
+}
+
+::placeholder {
+    opacity: 1;
+    color: var(--color-text-muted, #666666);
+}
+
+:input-placeholder {
+    opacity: 1;
+    color: var(--color-text-muted, #666666);
+}
+
+::input-placeholder {
+    opacity: 1;
+    color: var(--color-text-muted, #666666);
+}
+
+::placeholder {
+    opacity: 1;
+    color: var(--color-text-muted, #666666);
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    * {
+        background: transparent !important;
+        color: #000000 !important;
+        text-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999999;
+        page-break-inside: avoid;
+    }
+
+    img {
+        page-break-inside: avoid;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    * {
+        border-color: currentcolor !important;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        border-width: 2px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
+
+/* Light mode support */
+@media (prefers-color-scheme: light) {
+    :root {
+        color-scheme: light;
+    }
+}
+
+/* Reduced transparency support */
+@media (prefers-reduced-transparency: reduce) {
+    * {
+        opacity: 1 !important;
+    }
+
+    .backdrop-blur {
+        background-color: var(--color-background, #0a0a0a);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}

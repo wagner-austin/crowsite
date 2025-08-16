@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+package-lock.json
+poetry.lock
+
+# Build outputs
+dist/
+build/
+coverage/
+*.min.js
+*.min.css
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Documentation
+lighthouse-report.html
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Temporary
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Archives
+*.zip
+*.tar.gz
+
+# Binary files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+*.woff
+*.woff2
+*.ttf
+*.eot

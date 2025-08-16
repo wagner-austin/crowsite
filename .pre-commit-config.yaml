@@ -1,0 +1,66 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+        language_version: python3.9
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        args: ["--max-line-length=100", "--extend-ignore=E203"]
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint
+        entry: npx eslint
+        language: system
+        files: \.(js|jsx)$
+        args: ["--fix"]
+        pass_filenames: true
+
+      - id: stylelint
+        name: Stylelint
+        entry: npx stylelint
+        language: system
+        files: \.css$
+        args: ["--fix"]
+        pass_filenames: true
+
+      - id: prettier
+        name: Prettier
+        entry: npx prettier
+        language: system
+        files: \.(js|jsx|css|html|json|md|yml|yaml)$
+        args: ["--write"]
+        pass_filenames: true
+
+      - id: htmlhint
+        name: HTMLHint
+        entry: npx htmlhint
+        language: system
+        files: \.html$
+        pass_filenames: true

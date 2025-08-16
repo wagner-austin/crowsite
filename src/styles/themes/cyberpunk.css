@@ -1,0 +1,29 @@
+[data-theme="cyberpunk"] {
+    --color-primary: #00ffcc;
+    --color-secondary: #ff00ff;
+    --color-accent: #ffff00;
+    --color-bg-primary: #0a0a0a;
+    --color-bg-secondary: #1a1a1a;
+    --color-bg-tertiary: #2a2a2a;
+
+    background-image:
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+}
+
+[data-theme="cyberpunk"] .glitch {
+    animation-duration: 0.3s;
+}
+
+[data-theme="cyberpunk"] .terminal-wrapper {
+    box-shadow:
+        0 0 30px rgba(0, 255, 204, 0.6),
+        inset 0 0 30px rgba(0, 255, 204, 0.1);
+}
+
+[data-theme="cyberpunk"] .btn-primary:hover {
+    box-shadow:
+        0 0 20px var(--color-primary),
+        0 0 40px var(--color-primary),
+        0 0 60px var(--color-primary);
+}

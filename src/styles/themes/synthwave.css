@@ -1,0 +1,40 @@
+[data-theme="synthwave"] {
+    --color-primary: #ff6ec7;
+    --color-secondary: #7c4dff;
+    --color-accent: #18ffff;
+    --color-bg-primary: #0f0817;
+    --color-bg-secondary: #1a0f2e;
+    --color-bg-tertiary: #2d1b69;
+
+    background-image:
+        linear-gradient(180deg, var(--color-bg-primary) 0%, #2d1b69 100%),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 110, 199, 0.03) 2px,
+            rgba(255, 110, 199, 0.03) 4px
+        );
+}
+
+[data-theme="synthwave"] .hero-section::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 50%;
+    opacity: 0.1;
+    background:
+        repeating-linear-gradient(0deg, #ff6ec7 0, #ff6ec7 1px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, #7c4dff 0, #7c4dff 1px, transparent 1px, transparent 20px);
+    pointer-events: none;
+    transform: rotateX(60deg);
+    perspective: 500px;
+}
+
+[data-theme="synthwave"] .glitch {
+    text-shadow:
+        2px 2px 0 #ff6ec7,
+        -2px -2px 0 #18ffff;
+}

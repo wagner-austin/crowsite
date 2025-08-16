@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en" data-theme="cyberpunk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta
+      name="description"
+      content="Retro-futuristic developer portfolio with terminal interface and cyberpunk aesthetics"
+    />
+    <meta
+      name="keywords"
+      content="developer, portfolio, cyberpunk, retro, terminal, gaming, full-stack, web development"
+    />
+    <meta name="author" content="Developer" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#00ffcc" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Performance -->
+    <meta name="renderer" content="webkit" />
+    <meta name="force-rendering" content="webkit" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!-- Apple/iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DEV_TERMINAL" />
+
+    <!-- Microsoft -->
+    <meta name="msapplication-TileColor" content="#0a0a0a" />
+    <meta name="msapplication-config" content="src/assets/browserconfig.xml" />
+
+    <title>// DEV_TERMINAL v1.0 | Retro Developer Portfolio</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="src/styles/main.css" as="style" />
+    <link rel="preload" href="src/js/main.js" as="script" crossorigin />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="DEV_TERMINAL | Retro Developer Portfolio" />
+    <meta
+      property="og:description"
+      content="Interactive terminal-style developer portfolio with retro-futuristic design"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://your-domain.com" />
+    <meta property="og:image" content="https://your-domain.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DEV_TERMINAL | Retro Developer Portfolio" />
+    <meta name="twitter:description" content="Interactive terminal-style developer portfolio" />
+    <meta name="twitter:image" content="https://your-domain.com/twitter-image.jpg" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/images/favicon.svg" />
+    <link rel="alternate icon" href="src/assets/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="src/assets/images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="src/assets/images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="src/assets/images/favicon-16x16.png" />
+    <link rel="manifest" href="src/assets/site.webmanifest" />
+
+    <!-- Fallback for older browsers -->
+    <script>
+      // Check for basic feature support
+      if (!window.addEventListener || !document.querySelector) {
+        document.write(
+          '<div style="padding: 20px; background: #000; color: #fff; text-align: center;">Your browser is not supported. Please upgrade to a modern browser.</div>'
+        );
+      }
+    </script>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+
+    <header class="main-header" role="banner">
+      <nav class="nav-primary" role="navigation" aria-label="Main navigation">
+        <div class="nav-brand">
+          <span class="logo-text glitch" data-text="DEV_TERMINAL">DEV_TERMINAL</span>
+          <span class="version">v1.0</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="#about" class="nav-link" data-section="about">[ABOUT]</a></li>
+          <li><a href="#projects" class="nav-link" data-section="projects">[PROJECTS]</a></li>
+          <li><a href="#skills" class="nav-link" data-section="skills">[SKILLS]</a></li>
+          <li><a href="#terminal" class="nav-link" data-section="terminal">[TERMINAL]</a></li>
+          <li><a href="#contact" class="nav-link" data-section="contact">[CONTACT]</a></li>
+        </ul>
+        <div class="nav-controls">
+          <button class="theme-toggle" aria-label="Toggle theme" data-tooltip="Change theme">
+            <span class="icon-theme"></span>
+          </button>
+          <button class="sound-toggle" aria-label="Toggle sound" data-tooltip="Toggle sound">
+            <span class="icon-sound"></span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content" role="main">
+      <section id="hero" class="hero-section" aria-labelledby="hero-title">
+        <div class="hero-grid">
+          <div class="hero-content">
+            <h1 id="hero-title" class="hero-title">
+              <span class="text-accent">Hello, World!</span>
+              <span class="typing-cursor">_</span>
+            </h1>
+            <div class="hero-subtitle typewriter">
+              <p>I'm a <span class="highlight">Full-Stack Developer</span></p>
+              <p>Building the future with retro aesthetics</p>
+            </div>
+            <div class="hero-cta">
+              <button class="btn btn-primary glitch-btn" data-text="INITIALIZE">INITIALIZE</button>
+              <button class="btn btn-secondary" data-text="VIEW_PROJECTS">VIEW_PROJECTS</button>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="matrix-rain" aria-hidden="true"></div>
+            <pre class="ascii-art" aria-label="ASCII art decoration">
+╔══════════════════════╗
+║  SYSTEM INITIALIZED  ║
+║  STATUS: ONLINE      ║
+║  MODE: INTERACTIVE   ║
+╚══════════════════════╝
+                    </pre
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section-about" aria-labelledby="about-title">
+        <div class="container">
+          <h2 id="about-title" class="section-title glitch" data-text="// ABOUT.ME">// ABOUT.ME</h2>
+          <div class="about-grid">
+            <div class="about-content">
+              <p class="lead-text">
+                Passionate developer crafting digital experiences at the intersection of retro aesthetics and modern
+                technology.
+              </p>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <span class="stat-number" data-count="5">0</span>
+                  <span class="stat-label">Years Experience</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-number" data-count="50">0</span>
+                  <span class="stat-label">Projects Completed</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-number" data-count="1000">0</span>
+                  <span class="stat-label">Commits</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="terminal" class="section-terminal" aria-labelledby="terminal-title">
+        <div class="container">
+          <h2 id="terminal-title" class="section-title">// COMMAND_LINE</h2>
+          <div class="terminal-wrapper">
+            <div class="terminal-header">
+              <span class="terminal-title">guest@dev-terminal:~$</span>
+              <div class="terminal-controls">
+                <button class="terminal-btn minimize" aria-label="Minimize"></button>
+                <button class="terminal-btn maximize" aria-label="Maximize"></button>
+                <button class="terminal-btn close" aria-label="Close"></button>
+              </div>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-output" id="terminal-output" role="log" aria-live="polite">
+                <p class="terminal-line">Welcome to DEV_TERMINAL v1.0</p>
+                <p class="terminal-line">Type 'help' for available commands</p>
+              </div>
+              <div class="terminal-input-line">
+                <span class="terminal-prompt">$</span>
+                <input
+                  type="text"
+                  class="terminal-input"
+                  id="terminal-input"
+                  aria-label="Terminal command input"
+                  placeholder="Enter command..."
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" class="section-projects" aria-labelledby="projects-title">
+        <div class="container">
+          <h2 id="projects-title" class="section-title">// PROJECTS.SHOWCASE</h2>
+          <div class="projects-grid" id="projects-grid"></div>
+        </div>
+      </section>
+
+      <section id="skills" class="section-skills" aria-labelledby="skills-title">
+        <div class="container">
+          <h2 id="skills-title" class="section-title">// TECH.STACK</h2>
+          <div class="skills-grid" id="skills-grid"></div>
+        </div>
+      </section>
+
+      <section id="contact" class="section-contact" aria-labelledby="contact-title">
+        <div class="container">
+          <h2 id="contact-title" class="section-title">// GET.IN.TOUCH</h2>
+          <div class="contact-content">
+            <form class="contact-form" id="contact-form">
+              <div class="form-group">
+                <label for="name">NAME:</label>
+                <input type="text" id="name" name="name" required class="form-input" />
+              </div>
+              <div class="form-group">
+                <label for="email">EMAIL:</label>
+                <input type="email" id="email" name="email" required class="form-input" />
+              </div>
+              <div class="form-group">
+                <label for="message">MESSAGE:</label>
+                <textarea id="message" name="message" required class="form-textarea" rows="5"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">TRANSMIT_MESSAGE</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="main-footer" role="contentinfo">
+      <div class="container">
+        <div class="footer-content">
+          <p class="footer-text">&copy; 2024 DEV_TERMINAL | Built with &lt;3 and JavaScript</p>
+          <div class="social-links">
+            <a href="#" aria-label="GitHub" class="social-link">GitHub</a>
+            <a href="#" aria-label="LinkedIn" class="social-link">LinkedIn</a>
+            <a href="#" aria-label="Twitter" class="social-link">Twitter</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div class="loading-screen" id="loading-screen" aria-hidden="true">
+      <div class="loader">
+        <span class="loader-text">INITIALIZING...</span>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="src/js/main.js"></script>
+  </body>
+</html>
