@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>404 - Page Not Found | DEV_TERMINAL</title>
+    <title>404 - Page Not Found</title>
     <style>
       * {
         margin: 0;
@@ -12,9 +12,9 @@
       }
 
       body {
-        font-family: 'Courier New', monospace;
-        background: #0a0a0a;
-        color: #00ffcc;
+        font-family: 'Crimson Text', Georgia, serif;
+        background: #000;
+        color: #fff;
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -25,160 +25,75 @@
       .container {
         text-align: center;
         padding: 2rem;
-        animation: flicker 2s infinite;
       }
 
       h1 {
         font-size: 8rem;
         margin-bottom: 1rem;
-        text-shadow: 0 0 20px #00ffcc;
+        font-weight: 700;
+        letter-spacing: -0.05em;
       }
 
       h2 {
         font-size: 2rem;
         margin-bottom: 2rem;
+        font-weight: 400;
       }
 
       .message {
         font-size: 1.2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 3rem;
         line-height: 1.6;
-      }
-
-      .terminal {
-        background: #000;
-        border: 2px solid #00ffcc;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 2rem auto;
-        max-width: 600px;
-        text-align: left;
-      }
-
-      .terminal-line {
-        margin-bottom: 0.5rem;
+        opacity: 0.8;
       }
 
       .btn {
         display: inline-block;
         padding: 1rem 2rem;
         background: transparent;
-        border: 2px solid #00ffcc;
-        color: #00ffcc;
+        border: 1px solid #fff;
+        color: #fff;
         text-decoration: none;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         transition: all 0.3s;
-        margin-top: 2rem;
       }
 
       .btn:hover {
-        background: #00ffcc;
-        color: #0a0a0a;
-        box-shadow: 0 0 20px #00ffcc;
+        background: #fff;
+        color: #000;
       }
 
-      @keyframes flicker {
-        0%,
-        100% {
+      /* Subtle animation */
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
           opacity: 1;
-        }
-        5% {
-          opacity: 0.9;
-        }
-        10% {
-          opacity: 1;
-        }
-        15% {
-          opacity: 0.95;
+          transform: translateY(0);
         }
       }
 
-      .glitch {
-        position: relative;
-      }
-
-      .glitch::before,
-      .glitch::after {
-        content: '404';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      .glitch::before {
-        animation: glitch-1 0.5s infinite;
-        color: #ff00ff;
-        z-index: -1;
-      }
-
-      .glitch::after {
-        animation: glitch-2 0.5s infinite;
-        color: #ffff00;
-        z-index: -2;
-      }
-
-      @keyframes glitch-1 {
-        0%,
-        100% {
-          clip: rect(2px, 9999px, 10px, 0);
-        }
-        20% {
-          clip: rect(15px, 9999px, 30px, 0);
-        }
-        40% {
-          clip: rect(40px, 9999px, 60px, 0);
-        }
-        60% {
-          clip: rect(65px, 9999px, 85px, 0);
-        }
-        80% {
-          clip: rect(90px, 9999px, 100px, 0);
-        }
-      }
-
-      @keyframes glitch-2 {
-        0%,
-        100% {
-          clip: rect(25px, 9999px, 40px, 0);
-        }
-        20% {
-          clip: rect(45px, 9999px, 65px, 0);
-        }
-        40% {
-          clip: rect(70px, 9999px, 90px, 0);
-        }
-        60% {
-          clip: rect(5px, 9999px, 20px, 0);
-        }
-        80% {
-          clip: rect(50px, 9999px, 70px, 0);
-        }
+      .container {
+        animation: fade-in 1s ease-out;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1 class="glitch">404</h1>
-      <h2>PAGE NOT FOUND</h2>
-      <p class="message">The page you're looking for has been moved to another dimension.</p>
-
-      <div class="terminal">
-        <div class="terminal-line">$ locate requested_page</div>
-        <div class="terminal-line">ERROR: File not found in current reality</div>
-        <div class="terminal-line">$ suggest alternative</div>
-        <div class="terminal-line">Redirecting to main terminal...</div>
-      </div>
-
-      <a href="/" class="btn">RETURN TO TERMINAL</a>
+      <h1>404</h1>
+      <h2>Page Not Found</h2>
+      <p class="message">The page you're looking for doesn't exist.</p>
+      <a href="/" class="btn">Return Home</a>
     </div>
 
     <script>
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 5000);
+      // Optional: Redirect after 5 seconds
+      // setTimeout(() => {
+      //   window.location.href = '/';
+      // }, 5000);
     </script>
   </body>
 </html>
