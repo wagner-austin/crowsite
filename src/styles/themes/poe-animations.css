@@ -1,0 +1,82 @@
+/* Scene animation timings (JS reads these) */
+:root {
+  --scene-zoom-ms: 1500ms;
+  --scene-zoom-out-ms: 1200ms;
+}
+
+/* Setup 3D perspective on container */
+[data-theme^="poe"] .parallax-container {
+  perspective: 1000px;
+  perspective-origin: center center;
+}
+
+/* Smooth transitions for camera - always active during zoom states */
+[data-theme^="poe"].is-zooming .parallax-layer,
+[data-theme^="poe"].zoomed-in .parallax-layer {
+  transition: transform var(--scene-zoom-ms) cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+[data-theme^="poe"].is-zooming .parallax-sprite,
+[data-theme^="poe"].zoomed-in .parallax-sprite {
+  transition: transform var(--scene-zoom-ms) cubic-bezier(0.4,0,0.2,1),
+              opacity var(--scene-zoom-ms) cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* Keep transition active for a moment after zoom completes */
+[data-theme^="poe"].zoom-settling .parallax-layer {
+  transition: transform 500ms cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+[data-theme^="poe"].zoom-settling .parallax-sprite {
+  transition: transform 500ms cubic-bezier(0.4,0,0.2,1),
+              opacity 500ms cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Clickable affordance for any zoom trigger */
+[data-zoom-trigger],
+[data-theme^="poe"] .parallax-sprite[data-zoom-trigger] {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+[data-zoom-trigger]:focus {
+  outline: 2px solid rgba(255,255,255,0.6);
+  outline-offset: 2px;
+}
+
+/* Camera dolly: direct transform overrides during zoom - NO parallax vars */
+[data-theme^="poe"].zoomed-in .parallax-far-back {
+  transform: translate3d(0, 0, 200px) !important;
+}
+[data-theme^="poe"].zoomed-in .parallax-back {
+  transform: translate3d(0, 0, 300px) !important;
+}
+[data-theme^="poe"].zoomed-in .parallax-mid {
+  transform: translate3d(0, 0, 400px) !important;
+}
+[data-theme^="poe"].zoomed-in .parallax-front {
+  transform: translate3d(0, 0, 600px) !important;
+}
+
+/* Trees slide out - these need transitions */
+[data-theme^="poe"].is-zooming .tree-close-left,
+[data-theme^="poe"].is-zooming .tree-close-right {
+  transition: transform var(--scene-zoom-ms) cubic-bezier(0.4,0,0.2,1),
+              opacity var(--scene-zoom-ms) cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+[data-theme^="poe"].zoomed-in .tree-close-left {
+  transform: translateX(-80vw) translateY(-50%) !important;
+  opacity: 0;
+}
+[data-theme^="poe"].zoomed-in .tree-close-right {
+  transform: translateX(80vw) translateY(-50%) !important;
+  opacity: 0;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme^="poe"] .parallax-layer,
+  [data-theme^="poe"] .parallax-sprite {
+    transition: none !important;
+  }
+}
