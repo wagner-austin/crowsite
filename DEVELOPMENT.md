@@ -35,7 +35,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/retro-dev-portfolio.git
+git clone https://github.com/wagner-austin/retro-dev-portfolio.git
 cd retro-dev-portfolio
 
 # Install all dependencies (npm + poetry)
