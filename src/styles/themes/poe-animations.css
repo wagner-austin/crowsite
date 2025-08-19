@@ -165,6 +165,13 @@
    TREE ANIMATIONS
    ============================================ */
 
+/* Default state (not zoomed, not animating) - explicitly set for robustness */
+[data-theme^="poe"]:not(.zoomed) .tree-close-left,
+[data-theme^="poe"]:not(.zoomed) .tree-close-right {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
 /* Trees slide out during zoom in */
 [data-theme^="poe"].animating.zoomed .tree-close-left,
 [data-theme^="poe"].animating.zoomed .tree-close-right {
@@ -177,7 +184,7 @@
 [data-theme^="poe"].animating:not(.zoomed) .tree-close-left,
 [data-theme^="poe"].animating:not(.zoomed) .tree-close-right {
     opacity: 1 !important;
-    transform: translateX(0) translateY(-50%) !important;
+    transform: translate3d(0, 0, 0) !important;
     transition:
         transform var(--scene-zoom-out-ms) var(--scene-zoom-easing),
         opacity var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
@@ -186,12 +193,12 @@
 /* Trees hidden when zoomed (steady state) */
 [data-theme^="poe"].zoomed .tree-close-left {
     opacity: 0 !important;
-    transform: translateX(-80vw) translateY(-50%) !important;
+    transform: translate3d(-80vw, 0, 0) !important;
 }
 
 [data-theme^="poe"].zoomed .tree-close-right {
     opacity: 0 !important;
-    transform: translateX(80vw) translateY(-50%) !important;
+    transform: translate3d(80vw, 0, 0) !important;
 }
 
 /* GPU optimization during animation only */
