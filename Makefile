@@ -20,7 +20,7 @@ CYAN := \033[0;36m
 WHITE := \033[1;37m
 NC := \033[0m # No Color
 
-.PHONY: help serve stop dev build lint lint-fix lint-check format test clean install deps check audit lighthouse validate all
+.PHONY: help serve stop dev build lint lint-fix lint-check format test clean install deps check audit lighthouse validate all debug
 
 # Default target
 .DEFAULT_GOAL := help
@@ -36,6 +36,7 @@ help:
 	@echo ""
 	@echo "$(YELLOW)🚀 Development:$(NC)"
 	@echo "  $(GREEN)make serve$(NC)       - Start dev server directly (PORT=$(PORT))"
+	@echo "  $(GREEN)make debug$(NC)       - Start server with debug mode enabled"
 	@echo "  $(GREEN)make dev$(NC)         - Start server in background (PORT=$(PORT))"
 	@echo "  $(GREEN)make stop$(NC)        - Stop the background server"
 	@echo "  $(GREEN)make status$(NC)      - Check if server is running"
@@ -112,6 +113,11 @@ deps:
 serve:
 	@echo "Starting server at http://localhost:$(PORT)..."
 	@python -c "import webbrowser; webbrowser.open('http://localhost:$(PORT)')"
+	@python -m http.server $(PORT)
+
+debug:
+	@echo "Starting server in debug mode at http://localhost:$(PORT)?debug=true..."
+	@python -c "import webbrowser; webbrowser.open('http://localhost:$(PORT)?debug=true')"
 	@python -m http.server $(PORT)
 
 dev:
