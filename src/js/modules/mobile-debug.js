@@ -29,6 +29,11 @@ export function createMobileDebugPanel(options = {}) {
     let tiltEventCount = 0;
     let lastTiltValues = { beta: 0, gamma: 0 };
     let lastParallaxValues = { mx: 0, my: 0, tx: 0, ty: 0, influence: 0 };
+    
+    // Track console logs
+    const logBuffer = [];
+    const MAX_LOGS = 100;
+    let logMode = 'info'; // 'debug' shows all, 'info' filters out debug/log messages
 
     // Check APIs
     const hasOrientation = window.DeviceOrientationEvent !== undefined;
@@ -431,12 +436,171 @@ export function createMobileDebugPanel(options = {}) {
         return content;
     };
 
+    const createLogsContent = () => {
+        let content = '';
+        
+        // Add mode toggle at the top
+        content += `
+            <div style="
+                margin-bottom: 10px;
+                padding: 8px;
+                background: rgba(0,255,0,0.05);
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            ">
+                <div style="display: flex; gap: 8px;">
+                    <button id="log-mode-info" style="
+                        background: ${logMode === 'info' ? 'rgba(0,255,0,0.2)' : 'transparent'};
+                        color: ${logMode === 'info' ? '#0f0' : '#666'};
+                        border: 1px solid ${logMode === 'info' ? '#0f0' : '#666'};
+                        padding: 4px 8px;
+                        border-radius: 3px;
+                        font-size: 10px;
+                        cursor: pointer;
+                    ">📋 Info</button>
+                    <button id="log-mode-debug" style="
+                        background: ${logMode === 'debug' ? 'rgba(0,255,0,0.2)' : 'transparent'};
+                        color: ${logMode === 'debug' ? '#0f0' : '#666'};
+                        border: 1px solid ${logMode === 'debug' ? '#0f0' : '#666'};
+                        padding: 4px 8px;
+                        border-radius: 3px;
+                        font-size: 10px;
+                        cursor: pointer;
+                    ">🔍 Debug</button>
+                </div>
+                <span style="color: #888; font-size: 9px;">
+                    ${logMode === 'info' ? 'No Debug' : 'All Logs'}
+                </span>
+            </div>
+        `;
+        
+        // Filter logs based on mode
+        const filteredLogs = logMode === 'info' 
+            ? logBuffer.filter(log => log.type !== 'debug') // Show everything except debug
+            : logBuffer;
+        
+        if (filteredLogs.length === 0) {
+            content += `<div style="color: #666; text-align: center; padding: 20px;">
+                ${logBuffer.length === 0 ? 'No logs captured yet' : 'No logs match current filter'}
+            </div>`;
+        } else {
+            content += '<div style="max-height: 45vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">';
+            
+            // Show logs in reverse order (newest first)
+            [...filteredLogs].reverse().forEach((log, index) => {
+                const timeStr = new Date(log.timestamp).toLocaleTimeString('en-US', { 
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    fractionalSecondDigits: 3
+                });
+                
+                // Style based on log type
+                let color = '#fff';
+                let bgColor = 'rgba(255,255,255,0.02)';
+                let icon = '📝';
+                
+                switch(log.type) {
+                    case 'error':
+                        color = '#ff4444';
+                        bgColor = 'rgba(255,0,0,0.1)';
+                        icon = '❌';
+                        break;
+                    case 'warn':
+                        color = '#ffaa00';
+                        bgColor = 'rgba(255,170,0,0.1)';
+                        icon = '⚠️';
+                        break;
+                    case 'info':
+                        color = '#00aaff';
+                        bgColor = 'rgba(0,170,255,0.1)';
+                        icon = 'ℹ️';
+                        break;
+                    case 'debug':
+                        color = '#888';
+                        bgColor = 'rgba(128,128,128,0.1)';
+                        icon = '🔍';
+                        break;
+                    case 'log':
+                    default:
+                        color = '#0f0';
+                        bgColor = 'rgba(0,255,0,0.05)';
+                        icon = '📝';
+                }
+                
+                content += `
+                    <div style="
+                        margin-bottom: 8px;
+                        padding: 6px 8px;
+                        background: ${bgColor};
+                        border-left: 2px solid ${color};
+                        border-radius: 2px;
+                        word-wrap: break-word;
+                        font-size: 10px;
+                    ">
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            margin-bottom: 4px;
+                            color: ${color};
+                            font-size: 9px;
+                        ">
+                            <span style="margin-right: 4px;">${icon}</span>
+                            <span style="flex: 1; font-weight: bold;">${log.type.toUpperCase()}</span>
+                            <span style="opacity: 0.7;">${timeStr}</span>
+                        </div>
+                        <div style="color: ${color}; line-height: 1.3;">
+                            ${log.message}
+                        </div>
+                        ${log.stack ? `<div style="
+                            margin-top: 4px;
+                            padding-top: 4px;
+                            border-top: 1px solid rgba(255,255,255,0.1);
+                            color: #ff6666;
+                            font-size: 9px;
+                            font-family: monospace;
+                            white-space: pre-wrap;
+                        ">${log.stack}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            content += '</div>';
+            
+            // Add clear button at bottom
+            content += `
+                <div style="
+                    margin-top: 8px;
+                    padding-top: 8px;
+                    border-top: 1px solid rgba(0,255,0,0.2);
+                    text-align: center;
+                ">
+                    <button id="clear-logs-btn" style="
+                        background: rgba(255,0,0,0.2);
+                        color: #ff6666;
+                        border: 1px solid #ff6666;
+                        padding: 4px 12px;
+                        border-radius: 3px;
+                        font-size: 10px;
+                        cursor: pointer;
+                    ">Clear Logs (${filteredLogs.length}/${logBuffer.length})</button>
+                </div>
+            `;
+        }
+        
+        return content;
+    };
+
     // Tab configuration
     const tabs = {
         trees: { label: '🌲 Trees', content: createTreesContent },
         parallax: { label: '🧭 Tilt', content: createParallaxContent },
         viewport: { label: '📱 View', content: createViewportContent },
         css: { label: '🎨 CSS', content: createCSSContent },
+        logs: { label: '📜 Logs', content: createLogsContent },
     };
 
     // Store tab buttons
@@ -512,6 +676,33 @@ export function createMobileDebugPanel(options = {}) {
             </div>
             ${content}
         `;
+        
+        // Add event listeners for logs tab controls
+        if (activeTab === 'logs') {
+            const clearBtn = contentArea.querySelector('#clear-logs-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    logBuffer.length = 0;
+                    updateContent();
+                });
+            }
+            
+            const infoBtn = contentArea.querySelector('#log-mode-info');
+            if (infoBtn) {
+                infoBtn.addEventListener('click', () => {
+                    logMode = 'info';
+                    updateContent();
+                });
+            }
+            
+            const debugBtn = contentArea.querySelector('#log-mode-debug');
+            if (debugBtn) {
+                debugBtn.addEventListener('click', () => {
+                    logMode = 'debug';
+                    updateContent();
+                });
+            }
+        }
     };
 
     // Panel toggle
@@ -582,6 +773,58 @@ export function createMobileDebugPanel(options = {}) {
     // Add to DOM
     document.body.appendChild(toggleBtn);
     document.body.appendChild(panel);
+    
+    // Intercept console methods to capture logs
+    const originalConsole = {
+        log: console.log,
+        error: console.error,
+        warn: console.warn,
+        info: console.info,
+        debug: console.debug
+    };
+    
+    const captureLog = (type, args) => {
+        // Call original console method
+        originalConsole[type].apply(console, args);
+        
+        // Capture for debug panel
+        const message = Array.from(args).map(arg => {
+            if (typeof arg === 'object') {
+                try {
+                    return JSON.stringify(arg, null, 2);
+                } catch (e) {
+                    return String(arg);
+                }
+            }
+            return String(arg);
+        }).join(' ');
+        
+        const logEntry = {
+            type,
+            message,
+            timestamp: Date.now(),
+            stack: type === 'error' && args[0] instanceof Error ? args[0].stack : null
+        };
+        
+        logBuffer.push(logEntry);
+        
+        // Keep buffer size limited
+        if (logBuffer.length > MAX_LOGS) {
+            logBuffer.shift();
+        }
+        
+        // Update display if logs tab is active
+        if (activeTab === 'logs' && !isCollapsed) {
+            updateContent();
+        }
+    };
+    
+    // Override console methods
+    console.log = (...args) => captureLog('log', args);
+    console.error = (...args) => captureLog('error', args);
+    console.warn = (...args) => captureLog('warn', args);
+    console.info = (...args) => captureLog('info', args);
+    console.debug = (...args) => captureLog('debug', args);
 
     // Initial setup
     if (isCollapsed) {
@@ -626,9 +869,19 @@ export function createMobileDebugPanel(options = {}) {
     };
 
     const destroy = () => {
+        // Restore original console methods
+        console.log = originalConsole.log;
+        console.error = originalConsole.error;
+        console.warn = originalConsole.warn;
+        console.info = originalConsole.info;
+        console.debug = originalConsole.debug;
+        
+        // Remove event listeners
         window.removeEventListener('resize', handleResize);
         window.removeEventListener('orientationchange', handleResize);
         window.visualViewport?.removeEventListener('resize', handleResize);
+        
+        // Remove DOM elements
         toggleBtn.remove();
         panel.remove();
     };
