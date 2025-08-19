@@ -168,27 +168,29 @@ export function initSceneAnimations({
      * @returns {Element|null} The trigger element if found
      */
     const findTriggerUnderPointer = (x, y) => {
-        const disabled = [];
-        let hit;
-        // peel top elements to reveal what's underneath
-        while ((hit = document.elementFromPoint(x, y))) {
-            if (hit.matches?.(triggerSelector)) {
-                break;
+        // 1) Exact stack under pointer (modern browsers)
+        if (document.elementsFromPoint) {
+            const stack = document.elementsFromPoint(x, y);
+            for (const el of stack) {
+                if (el.matches?.(triggerSelector)) {
+                    return el;
+                }
+                const anc = el.closest?.(triggerSelector);
+                if (anc) {
+                    return anc;
+                }
             }
-            // stop if we've peeled the root or nothing changes
-            if (hit === document.documentElement || hit === document.body) {
-                hit = null;
-                break;
+        }
+
+        // 2) Geometry fallback: any trigger whose rect contains the point
+        const candidates = document.querySelectorAll(triggerSelector);
+        for (const el of candidates) {
+            const r = el.getBoundingClientRect();
+            if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+                return el;
             }
-            // temporarily disable this layer to see below it
-            disabled.push(hit);
-            hit.style.setProperty('pointer-events', 'none', 'important');
         }
-        // restore pointer-events
-        for (const el of disabled) {
-            el.style.removeProperty('pointer-events');
-        }
-        return hit?.matches?.(triggerSelector) ? hit : null;
+        return null;
     };
 
     /**
@@ -197,13 +199,10 @@ export function initSceneAnimations({
      * Makes triggers accessible by adding ARIA attributes
      */
     const onClick = e => {
-        console.log('[SceneAnimations] Click at:', e.clientX, e.clientY);
         const trigger = findTriggerUnderPointer(e.clientX, e.clientY);
         if (!trigger) {
-            console.log('[SceneAnimations] No trigger found under pointer');
             return;
         }
-        console.log('[SceneAnimations] Trigger found under pointer:', trigger);
         e.preventDefault();
         // Make anything a11y-pressable
         trigger.setAttribute('role', 'button');
