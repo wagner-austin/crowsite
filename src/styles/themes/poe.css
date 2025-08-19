@@ -88,7 +88,10 @@
     position: fixed;
     z-index: var(--z-back);
     width: 100%;
+
+    /* Fallback first, then dvh overrides when supported */
     height: 100vh;
+    height: 100dvh;
     pointer-events: none;
     inset: 0;
     perspective: 1000px;
@@ -117,6 +120,14 @@
 
 [data-theme^="poe"] .parallax-front {
     z-index: var(--z-foreground);
+
+    /* No overscan at all - exact viewport size for proper tree positioning */
+    inset: 0;
+    width: 100%;
+    height: 100%;
+
+    /* Horizontal parallax only — keeps ground-anchored elements from drifting */
+    transform: translate3d(var(--dx), 0, 0);
 }
 
 /* ============================================
@@ -338,6 +349,7 @@
     left: 2%;
     width: auto;
     height: 80vh;
+    height: 80dvh;
     max-height: 80%;
 }
 
@@ -347,6 +359,7 @@
     bottom: 0;
     width: auto;
     height: 50vh;
+    height: 50dvh;
     max-height: 50%;
 }
 
@@ -356,16 +369,34 @@
     left: 35%;
     width: auto;
     height: 30vh;
+    height: 30dvh;
     max-height: 30%;
 }
 
-/* Front layer elements */
+/* Close trees should always sit on the ground line */
 [data-theme^="poe"] .tree-close-left,
 [data-theme^="poe"] .tree-close-right {
     position: absolute;
-    top: 50%;
-    height: auto;
-    transform: translateY(-50%);
+
+    /* reset legacy centering */
+    inset: auto auto 0;
+
+    /* Since parent has top overscan of -10%, we need to compensate */
+    /* Using calc to position relative to actual viewport bottom */
+
+    /* Let responsive.css assign the height */
+    width: auto;
+
+    /* Allow trees to fill full viewport */
+    max-height: 100vh;
+    max-height: 100dvh;
+
+    /* Use translate3d for consistent GPU acceleration and smooth animations */
+    transform: translate3d(0, 0, 0);
+
+    /* Never crop the top on iOS; keep full sprite visible */
+    object-fit: contain;
+    object-position: center bottom;
 }
 
 [data-theme^="poe"] .tree-close-left {
@@ -388,6 +419,7 @@
     left: 30%;
     width: auto;
     height: 25vh;
+    height: 25dvh;
     max-height: 25%;
 }
 
