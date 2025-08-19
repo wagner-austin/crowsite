@@ -422,44 +422,6 @@ picture img {
     transition: filter 0.3s;
 }
 
-/* Matrix Rain Effect */
-.matrix-rain {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.matrix-rain::before {
-    content: "10101010101010101010";
-    position: absolute;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    height: 200%;
-    opacity: 0.1;
-    color: #00ff00;
-    font-family: monospace;
-    font-size: 10px;
-    line-height: 10px;
-    word-break: break-all;
-    animation: matrix-fall 20s linear infinite;
-}
-
-@keyframes matrix-fall {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(50%);
-    }
-}
-
 /* Responsive Adjustments */
 @media (width <= 768px) {
     .lightbox-content {
@@ -498,7 +460,6 @@ picture img {
 @media (prefers-reduced-motion: reduce) {
     .scanlines::after,
     .glitch-image.glitching,
-    .matrix-rain::before,
     [data-parallax] {
         animation: none;
     }
