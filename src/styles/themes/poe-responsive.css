@@ -4,7 +4,8 @@
 
 /* Base = mobile first */
 [data-theme^="poe"] .parallax-container {
-    height: 100vh;
+    height: 100vh; /* fallback */
+    height: 100dvh; /* preferred */
 }
 
 /* Default tree sizing for all screens */
@@ -12,7 +13,10 @@
 [data-theme^="poe"] .tree-close-right {
     width: auto;
     max-width: none;
-    height: min(110vh, 55vw); /* Responsive height */
+
+    /* Full viewport height by default */
+    height: 100vh;
+    height: 100dvh;
 }
 
 /* Mobile portrait: Taller trees that frame the scene better */
@@ -20,16 +24,17 @@
     [data-theme^="poe"] .tree-close-left,
     [data-theme^="poe"] .tree-close-right {
         width: auto;
-        height: 75vh; /* Much taller on portrait */
+        height: 100vh; /* fallback */
+        height: 100dvh; /* preferred */
         max-height: none;
     }
 
     [data-theme^="poe"] .tree-close-left {
-        left: -8%; /* Pull in slightly closer */
+        left: -25%; /* Less horizontal obstruction on mobile */
     }
 
     [data-theme^="poe"] .tree-close-right {
-        right: -8%; /* Pull in slightly closer */
+        right: -25%; /* Less horizontal obstruction on mobile */
     }
 
     /* Bigger town background on mobile portrait */
@@ -39,14 +44,16 @@
     }
 }
 
-/* Mobile landscape: Scale trees vertically to prevent cutoff */
+/* Mobile landscape: Trees fill viewport height */
 @media (width <= 767px) and (orientation: landscape) {
     [data-theme^="poe"] .tree-close-left,
     [data-theme^="poe"] .tree-close-right {
         width: auto;
-        height: 130vh; /* Even taller to prevent cutoff */
+        height: 100vh; /* fallback */
+        height: 100dvh; /* preferred */
         max-height: none;
-        transform: translateY(-45%) scaleY(1.7); /* Scale vertically by 70% and move down 5% */
+
+        /* Removed the old transform hack */
     }
 
     /* Bigger town background on mobile landscape */
@@ -68,7 +75,16 @@
     [data-theme^="poe"] .tree-close-left,
     [data-theme^="poe"] .tree-close-right {
         width: auto;
-        height: 90vh;
+        height: 100vh; /* fallback */
+        height: 100dvh; /* preferred - full height */
+    }
+
+    [data-theme^="poe"] .tree-close-left {
+        left: -15%; /* Slightly more horizontal coverage on tablet */
+    }
+
+    [data-theme^="poe"] .tree-close-right {
+        right: -15%; /* Slightly more horizontal coverage on tablet */
     }
 }
 
@@ -77,6 +93,15 @@
     [data-theme^="poe"] .tree-close-left,
     [data-theme^="poe"] .tree-close-right {
         width: auto;
-        height: min(110vh, 55vw);
+        height: 100vh; /* fallback */
+        height: 100dvh; /* preferred - full height */
+    }
+
+    [data-theme^="poe"] .tree-close-left {
+        left: 0; /* More horizontal obstruction on desktop */
+    }
+
+    [data-theme^="poe"] .tree-close-right {
+        right: 0; /* More horizontal obstruction on desktop */
     }
 }
