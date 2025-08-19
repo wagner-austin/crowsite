@@ -90,9 +90,10 @@ make check     # Run comprehensive verification
 
 ## Next Steps
 
-1. **Customize content**: Edit `index.html` with your info
-2. **Modify theme**: Change colors in `src/styles/base/variables.css`
-3. **Add projects**: Update data in `src/js/main.js`
+1. **Customize content**: Edit `index.html` for portfolio content
+2. **Modify theme**: Adjust Poe theme colors in
+   `src/styles/themes/poe-theme-system.css`
+3. **Add features**: Extend modules in `src/js/modules/`
 4. **Deploy**: Push to GitHub and enable Pages
 
 ---
