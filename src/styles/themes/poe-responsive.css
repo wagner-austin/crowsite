@@ -15,13 +15,44 @@
     height: min(110vh, 55vw); /* Responsive height */
 }
 
-/* Mobile: Close trees minimal so they don't overwhelm */
-@media (width <= 767px) {
+/* Mobile portrait: Taller trees that frame the scene better */
+@media (width <= 767px) and (orientation: portrait) {
     [data-theme^="poe"] .tree-close-left,
     [data-theme^="poe"] .tree-close-right {
-        width: 35vw;
-        max-width: 180px;
-        height: auto;
+        width: auto;
+        height: 75vh; /* Much taller on portrait */
+        max-height: none;
+    }
+
+    [data-theme^="poe"] .tree-close-left {
+        left: -8%; /* Pull in slightly closer */
+    }
+
+    [data-theme^="poe"] .tree-close-right {
+        right: -8%; /* Pull in slightly closer */
+    }
+
+    /* Bigger town background on mobile portrait */
+    [data-theme^="poe"] .town-background {
+        width: 70vw;
+        max-width: none;
+    }
+}
+
+/* Mobile landscape: Scale trees vertically to prevent cutoff */
+@media (width <= 767px) and (orientation: landscape) {
+    [data-theme^="poe"] .tree-close-left,
+    [data-theme^="poe"] .tree-close-right {
+        width: auto;
+        height: 130vh; /* Even taller to prevent cutoff */
+        max-height: none;
+        transform: translateY(-45%) scaleY(1.7); /* Scale vertically by 70% and move down 5% */
+    }
+
+    /* Bigger town background on mobile landscape */
+    [data-theme^="poe"] .town-background {
+        width: 55vw;
+        max-width: none;
     }
 }
 
