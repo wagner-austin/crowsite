@@ -2,13 +2,13 @@
 
 /**
  * Poe Parallax Module
- * 
+ *
  * Provides multi-layer parallax effects for the Poe theme including:
  * - Mouse/pointer-based parallax on desktop
  * - Gyroscope/tilt-based parallax on mobile devices
  * - Scroll-based parallax for all devices
  * - Smooth zoom animations with proper state management
- * 
+ *
  * Features:
  * - Cross-browser support (Chrome, Firefox, Edge, Safari on both Android and iOS)
  * - Automatic permission handling for iOS motion sensors
@@ -118,8 +118,8 @@ export function initPoeParallax() {
     // Mobile optimization - reduce or disable parallax on small/touch devices
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-    const POINTER_MULT = (isMobile || isCoarse) ? 0 : 1;    // no pointer sway on phones
-    const SCROLL_MULT = isMobile ? 0.3 : 1;                 // gentler scroll parallax on phones
+    const POINTER_MULT = isMobile || isCoarse ? 0 : 1; // no pointer sway on phones
+    const SCROLL_MULT = isMobile ? 0.3 : 1; // gentler scroll parallax on phones
 
     const MAX_X = 12;
     const MAX_Y = 10;
@@ -165,8 +165,7 @@ export function initPoeParallax() {
     const mqlReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const SECURE = window.isSecureContext; // HTTPS required by Chrome/Edge/Firefox
     const HAS_TILT =
-        typeof DeviceOrientationEvent !== 'undefined' ||
-        typeof DeviceMotionEvent !== 'undefined';
+        typeof DeviceOrientationEvent !== 'undefined' || typeof DeviceMotionEvent !== 'undefined';
 
     let tiltZero = null; // Calibration baseline - first reading becomes "center"
 
@@ -177,18 +176,24 @@ export function initPoeParallax() {
      * Handles both modern screen.orientation API and legacy window.orientation
      */
     function screenAngle() {
-        if (screen?.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle;
-        if (typeof window.orientation === 'number') return window.orientation;
+        if (screen?.orientation && typeof screen.orientation.angle === 'number') {
+            return screen.orientation.angle;
+        }
+        if (typeof window.orientation === 'number') {
+            return window.orientation;
+        }
         return 0;
     }
-    
+
     /**
      * Detect if device is in landscape orientation
      * Uses multiple methods for compatibility across browsers
      */
     function isLandscape() {
         const t = screen?.orientation?.type || '';
-        return t.includes('landscape') || Math.abs(screenAngle()) === 90 || (innerWidth > innerHeight);
+        return (
+            t.includes('landscape') || Math.abs(screenAngle()) === 90 || innerWidth > innerHeight
+        );
     }
 
     /**
@@ -198,31 +203,40 @@ export function initPoeParallax() {
      */
     function onTilt(e) {
         // Skip during animations, zoom state, hidden tabs, or if user prefers reduced motion
-        if (document.documentElement.classList.contains('animating') ||
+        if (
+            document.documentElement.classList.contains('animating') ||
             document.documentElement.classList.contains('zoomed') ||
-            document.hidden || mqlReduced.matches) return;
+            document.hidden ||
+            mqlReduced.matches
+        ) {
+            return;
+        }
 
-        const beta  = e.beta  ?? 0; // front/back tilt
+        const beta = e.beta ?? 0; // front/back tilt
         const gamma = e.gamma ?? 0; // left/right tilt
 
         // Map axes depending on orientation
-        let gx, gy;
+        let gx;
+        let gy;
         if (isLandscape()) {
-            gx = beta;    // forward/back controls horizontal in landscape
-            gy = -gamma;  // flip so left tilt moves content left
+            gx = beta; // forward/back controls horizontal in landscape
+            gy = -gamma; // flip so left tilt moves content left
         } else {
-            gx = gamma;   // left/right
-            gy = beta;    // forward/back
+            gx = gamma; // left/right
+            gy = beta; // forward/back
         }
 
         // First reading becomes baseline (calibration)
-        if (!tiltZero) tiltZero = { gx, gy };
+        if (!tiltZero) {
+            tiltZero = { gx, gy };
+        }
 
         const dx = gx - tiltZero.gx;
         const dy = gy - tiltZero.gy;
 
         // Match mouse ranges; tune sensitivity instead
-        const SENS_X = 35, SENS_Y = 35; // higher = less sensitive
+        const SENS_X = 35;
+        const SENS_Y = 35; // higher = less sensitive
         const txTilt = clamp((dx / SENS_X) * MAX_X, -MAX_X, MAX_X);
         const tyTilt = clamp((dy / SENS_Y) * MAX_Y, -MAX_Y, MAX_Y);
 
@@ -236,7 +250,9 @@ export function initPoeParallax() {
      * Reset tilt calibration baseline
      * Called when device orientation changes or tab regains focus
      */
-    function resetTiltBaseline() { tiltZero = null; }
+    function resetTiltBaseline() {
+        tiltZero = null;
+    }
 
     function attachTiltListeners() {
         const opts = { passive: true, signal: ctrl.signal };
@@ -260,26 +276,30 @@ export function initPoeParallax() {
             'position:fixed;bottom:12px;right:12px;z-index:9999;padding:.5rem .75rem;border-radius:10px;' +
             'border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.55);color:#fff;' +
             'backdrop-filter:blur(6px);font:600 14px system-ui;cursor:pointer';
-        btn.addEventListener('click', async () => {
-            try {
-                const res = await DeviceOrientationEvent.requestPermission();
-                if (res === 'granted') {
-                    attachTiltListeners();
-                    btn.remove();
-                } else {
-                    btn.textContent = 'Motion blocked in iOS settings';
+        btn.addEventListener(
+            'click',
+            async () => {
+                try {
+                    const res = await DeviceOrientationEvent.requestPermission();
+                    if (res === 'granted') {
+                        attachTiltListeners();
+                        btn.remove();
+                    } else {
+                        btn.textContent = 'Motion blocked in iOS settings';
+                    }
+                } catch {
+                    btn.textContent = 'Motion not available';
                 }
-            } catch {
-                btn.textContent = 'Motion not available';
-            }
-        }, { passive: true, signal: ctrl.signal });
+            },
+            { passive: true, signal: ctrl.signal }
+        );
         document.body.appendChild(btn);
     }
 
     // Debug logging state
     let lastDebugTime = 0;
     const DEBUG_THROTTLE = 1000; // Log at most once per second
-    
+
     /**
      * Apply current parallax values to all layers
      * Updates CSS custom properties for transform values
@@ -290,7 +310,7 @@ export function initPoeParallax() {
         if (document.documentElement.classList.contains('animating') || document.hidden) {
             return;
         }
-        
+
         const sy = window.scrollY || 0;
 
         // Reduce parallax when zoomed in for subtle movement
@@ -328,7 +348,9 @@ export function initPoeParallax() {
 
         // Log consolidated debug info
         if (debugInfo) {
-            console.log(`[Parallax] mx:${mx.toFixed(1)} my:${my.toFixed(1)} | ${debugInfo.join(' | ')}`);
+            console.log(
+                `[Parallax] mx:${mx.toFixed(1)} my:${my.toFixed(1)} | ${debugInfo.join(' | ')}`
+            );
         }
     };
 
@@ -431,7 +453,9 @@ export function initPoeParallax() {
      * Sets up visibility/focus listeners for recalibration
      */
     (function initTilt() {
-        if (!HAS_TILT) return;
+        if (!HAS_TILT) {
+            return;
+        }
 
         const needsIOSPerm =
             typeof DeviceOrientationEvent !== 'undefined' &&
@@ -442,17 +466,23 @@ export function initPoeParallax() {
             return;
         }
         if (needsIOSPerm) {
-            showIOSMotionButton();      // adds the enable button and wires listeners on grant
+            showIOSMotionButton(); // adds the enable button and wires listeners on grant
         } else {
-            attachTiltListeners();      // Android + desktop browsers that allow without prompt
+            attachTiltListeners(); // Android + desktop browsers that allow without prompt
         }
 
         // Nice-to-have: rebaseline on visibility/focus
         const opts = { passive: true, signal: ctrl.signal };
         window.addEventListener('focus', resetTiltBaseline, opts);
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) resetTiltBaseline();
-        }, { signal: ctrl.signal });
+        document.addEventListener(
+            'visibilitychange',
+            () => {
+                if (!document.hidden) {
+                    resetTiltBaseline();
+                }
+            },
+            { signal: ctrl.signal }
+        );
     })();
 
     // Start perfectly centered; we won't react to pointer until it moves (or device motion fires)

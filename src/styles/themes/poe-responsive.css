@@ -4,48 +4,48 @@
 
 /* Base = mobile first */
 [data-theme^="poe"] .parallax-container {
-  height: 100vh;
+    height: 100vh;
 }
 
 /* Default tree sizing for all screens */
 [data-theme^="poe"] .tree-close-left,
 [data-theme^="poe"] .tree-close-right {
-  width: auto;
-  height: min(110vh, 55vw);  /* Responsive height */
-  max-width: none;
+    width: auto;
+    max-width: none;
+    height: min(110vh, 55vw); /* Responsive height */
 }
 
 /* Mobile: Close trees minimal so they don't overwhelm */
-@media (max-width: 767px) {
-  [data-theme^="poe"] .tree-close-left,
-  [data-theme^="poe"] .tree-close-right {
-    width: 35vw;
-    height: auto;
-    max-width: 180px;
-  }
+@media (width <= 767px) {
+    [data-theme^="poe"] .tree-close-left,
+    [data-theme^="poe"] .tree-close-right {
+        width: 35vw;
+        max-width: 180px;
+        height: auto;
+    }
 }
 
 /* Optionally hide the super-foreground layer on very small widths */
-@media (max-width: 400px) {
-  [data-theme^="poe"] .parallax-front {
-    display: none;
-  }
+@media (width <= 400px) {
+    [data-theme^="poe"] .parallax-front {
+        display: none;
+    }
 }
 
 /* Tablet */
-@media (min-width: 768px) and (max-width: 1023px) {
-  [data-theme^="poe"] .tree-close-left,
-  [data-theme^="poe"] .tree-close-right {
-    width: auto;
-    height: 90vh;
-  }
+@media (width >= 768px) and (width <= 1023px) {
+    [data-theme^="poe"] .tree-close-left,
+    [data-theme^="poe"] .tree-close-right {
+        width: auto;
+        height: 90vh;
+    }
 }
 
 /* Desktop */
-@media (min-width: 1024px) {
-  [data-theme^="poe"] .tree-close-left,
-  [data-theme^="poe"] .tree-close-right {
-    width: auto;
-    height: min(110vh, 55vw);
-  }
+@media (width >= 1024px) {
+    [data-theme^="poe"] .tree-close-left,
+    [data-theme^="poe"] .tree-close-right {
+        width: auto;
+        height: min(110vh, 55vw);
+    }
 }
