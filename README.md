@@ -1,7 +1,7 @@
-# 🚀 Retro Dev Portfolio - Terminal Edition
+# 🦇 Retro Dev Portfolio - Poe Theme Edition
 
-A cyberpunk-themed, retro-futuristic developer portfolio with an interactive
-terminal interface, built with vanilla HTML, CSS, and JavaScript.
+A minimalist developer portfolio featuring an atmospheric Poe theme with
+parallax effects, built with vanilla HTML, CSS, and JavaScript.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-00ffcc)
 ![License](https://img.shields.io/badge/license-MIT-ff00ff)
@@ -11,18 +11,21 @@ terminal interface, built with vanilla HTML, CSS, and JavaScript.
 
 ### 🎨 Visual Design
 
-- **Multiple Themes**: Cyberpunk, Synthwave, Matrix, Vaporwave
+- **Poe Theme**: Gothic atmosphere with light and dark variants
+- **Poe Theme Features**: Multi-layer parallax, flying crows, falling feathers,
+  zoom animations
+- **Mobile Support**: Gyroscope-based parallax on mobile devices
 - **Glitch Effects**: Authentic retro-futuristic animations
 - **Neon Aesthetics**: Dynamic glow effects and color schemes
 - **Matrix Rain**: Animated background effects
 - **Scanlines & Noise**: CRT monitor simulation
 
-### 💻 Interactive Terminal
+### 🎭 Interactive Features
 
-- **30+ Commands**: Full terminal emulation with command history
-- **Auto-complete**: Tab completion for commands
-- **Custom Commands**: Extensible command system
-- **ASCII Art**: Retro terminal graphics
+- **Click-to-Zoom**: Interactive parallax scene exploration
+- **Mobile Tilt**: Gyroscope-based parallax on mobile devices
+- **Adaptive Images**: Responsive images for all screen sizes
+- **Atmospheric Effects**: Flying crows and falling feathers
 
 ### 🏗️ Architecture
 
@@ -46,7 +49,7 @@ terminal interface, built with vanilla HTML, CSS, and JavaScript.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/retro-dev-portfolio.git
+git clone https://github.com/wagner-austin/retro-dev-portfolio.git
 cd retro-dev-portfolio
 ```
 
@@ -104,51 +107,28 @@ retro-dev-portfolio/
     └── README.md          # Documentation
 ```
 
-## 🎮 Terminal Commands
+## 🎮 Interactions
 
-| Command        | Description                                         |
-| -------------- | --------------------------------------------------- |
-| `help`         | Show all available commands                         |
-| `about`        | Display developer information                       |
-| `skills`       | List technical skills                               |
-| `projects`     | Show portfolio projects                             |
-| `theme [name]` | Change theme (cyberpunk/synthwave/matrix/vaporwave) |
-| `clear`        | Clear terminal output                               |
-| `matrix`       | Activate Matrix mode                                |
-| `game`         | Launch mini-game                                    |
-| `hack`         | Initialize hacking sequence                         |
-| `neofetch`     | Display system information                          |
+- **Click on Town**: Zoom into the parallax scene
+- **Escape Key**: Exit zoom mode
+- **Mobile Tilt**: Tilt your phone to move the parallax layers
+- **Theme Toggle**: Switch between light and dark Gothic themes
 
 ## 🛠️ Customization
 
-### Adding New Themes
+### Theme Configuration
 
-1. Create a new theme file in `src/styles/themes/`:
+The Poe theme comes in two variants:
 
-```css
-[data-theme='yourtheme'] {
-    --color-primary: #yourcolor;
-    --color-secondary: #yourcolor;
-    /* ... */
-}
-```
+- **poe-light**: Light Gothic atmosphere
+- **poe-dark**: Dark Gothic atmosphere
 
-2. Register in `src/js/modules/theme.js`:
+Themes are managed in `src/js/modules/theme.js` and styled in:
 
-```javascript
-this.themes = ['cyberpunk', 'synthwave', 'matrix', 'vaporwave', 'yourtheme'];
-```
-
-### Adding Terminal Commands
-
-In `src/js/modules/terminal.js`:
-
-```javascript
-this.register('yourcommand', args => {
-    // Command logic
-    return 'Command output';
-});
-```
+- `src/styles/themes/poe-theme-system.css` - Color definitions
+- `src/styles/themes/poe.css` - Layout and structure
+- `src/styles/themes/poe-animations.css` - Animation states
+- `src/styles/themes/poe-responsive.css` - Mobile optimizations
 
 ### Modifying Animations
 
@@ -202,7 +182,7 @@ details.
 
 ## 🙏 Acknowledgments
 
-- Inspired by cyberpunk aesthetics and retro computing
+- Inspired by Gothic literature and atmospheric design
 - Built with vanilla JavaScript for maximum performance
 - No frameworks, no dependencies, just pure web technologies
 
