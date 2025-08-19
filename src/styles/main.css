@@ -15,6 +15,7 @@
 /* Theme System - variables first, then theme styles */
 @import url("themes/poe-theme-system.css");
 @import url("themes/poe.css");
+@import url("themes/poe-responsive.css");
 @import url("themes/poe-animations.css");
 
 /* Minimal components - will add more as needed */
