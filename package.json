@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "npx serve -l 3000 --no-clipboard",
     "dev:network": "npx serve -l 3000 -n --no-clipboard",
+    "dev:https": "npx serve -l 3000 -n --ssl-cert cert.pem --ssl-key key.pem --no-clipboard",
     "build": "npm run lint && npm run format:check",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
     "lint:js": "eslint 'src/**/*.js' --fix",
