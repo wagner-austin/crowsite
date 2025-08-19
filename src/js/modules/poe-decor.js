@@ -1,5 +1,29 @@
 /* eslint-env browser */
 
+/**
+ * Poe Decorations Module
+ *
+ * Adds atmospheric decorative elements to the Poe theme:
+ * - Flying crows that cross the screen
+ * - Falling feathers with physics simulation
+ * - Ambient particle effects
+ * - Scroll-based drift animations
+ *
+ * Features:
+ * - Performance-aware spawning (reduced on low-end devices)
+ * - Respects user's save-data and device memory
+ * - Fallback SVGs for missing images
+ * - Physics-based feather movement with mouse velocity influence
+ * - Pauses animations when tab is hidden
+ *
+ * Mobile specific:
+ * - Crow positioned correctly with visualViewport API
+ * - Animation overrides for reduced motion compatibility
+ * - Safety timeouts for animation cleanup
+ *
+ * @module poe-decor
+ */
+
 const isPoeTheme = () => {
     const theme = document.documentElement.getAttribute('data-theme');
     return theme && theme.startsWith('poe');
@@ -58,6 +82,11 @@ function ensureParticles() {
     document.body.appendChild(wrap);
 }
 
+/**
+ * Spawn a crow that flies across the screen
+ * Limited to 1 crow at a time to avoid overwhelming the scene
+ * Uses visualViewport for accurate mobile positioning
+ */
 function spawnCrow() {
     if (!isPoeTheme() || document.hidden || !underCap('.crow', 1)) {
         return;
@@ -76,14 +105,20 @@ function spawnCrow() {
         handleSpriteLoadError(el, sprite, CROW_SVG_FALLBACK);
     };
 
-    const vh = window.innerHeight;
-    const startTop = 10 + Math.random() * (vh * 0.15); // Top 10% to 25% of screen
-    // Crow PNGs face right, so always fly left to right
-    el.style.top = `${startTop}px`;
-    el.style.left = `-150px`;
+    // Use visualViewport for accurate height on mobile
+    const vh = window.visualViewport?.height ?? document.documentElement.clientHeight;
+    const startTopPx = Math.round(vh * 0.18); // ~upper fifth, reliable across modes
+
+    // Ensure crow is properly positioned and visible
+    el.style.position = 'fixed';
+    el.style.top = `${startTopPx}px`;
+    el.style.left = `-15vw`; // matches your keyframes (from -15vw to 115vw)
+    el.style.zIndex = '9999'; // Above everything
     el.style.transform = `translate3d(0, var(--scroll-drift, 0px), 0)`;
-    el.style.animation = `fly-across ${18 + Math.random() * 10}s linear 1`;
+    const dur = 18 + Math.random() * 10;
+    el.style.setProperty('animation', `fly-across ${dur}s linear 1`, 'important'); // defeats any PRM "animation:none !important"
     el.addEventListener('animationend', () => el.remove());
+    setTimeout(() => el.remove(), dur * 1000 + 1500); // safety remove if animationend never fires
     document.body.appendChild(el);
 }
 
@@ -97,6 +132,14 @@ let lastMoveTime = performance.now();
 // Helper
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
+/**
+ * Apply physics simulation to a falling feather
+ * Includes gravity, drag, terminal velocity, and oscillating rotation
+ * @param {HTMLElement} el - The feather element
+ * @param {Object} velocities - Initial velocities
+ * @param {number} velocities.vx - Horizontal velocity (px/s)
+ * @param {number} velocities.vy - Vertical velocity (px/s)
+ */
 function physicsFall(el, { vx, vy }) {
     // Floaty fall (from last tweak)
     const G = 340; // gravity px/s^2
@@ -160,6 +203,11 @@ function physicsFall(el, { vx, vy }) {
     requestAnimationFrame(step);
 }
 
+/**
+ * Spawn a feather that falls with physics simulation
+ * Spawns near mouse position with velocity based on mouse movement
+ * Limited to 8 concurrent feathers for performance
+ */
 function spawnFeather() {
     if (!isPoeTheme() || document.hidden || !underCap('.feather', 8)) {
         return;
@@ -196,7 +244,12 @@ function spawnFeather() {
     physicsFall(el, { vx: vx0, vy: vy0 }); // Then start the physics loop
 }
 
-/* Smooth scroll-drift for crow/feathers */
+/**
+ * Create smooth scroll-based drift effect
+ * Updates CSS custom property for parallax elements
+ * Uses exponential smoothing for natural movement
+ * @returns {Function} Cleanup function to stop the animation
+ */
 function startScrollDrift() {
     let last = -1;
     let driftRaf;
@@ -214,6 +267,11 @@ function startScrollDrift() {
     return () => window.cancelAnimationFrame(driftRaf);
 }
 
+/**
+ * Initialize all Poe decorative elements
+ * Sets up particles, spawns initial creatures, and manages animation loops
+ * @returns {Function} Cleanup function to remove all decorations
+ */
 export function initPoeDecor() {
     ensureParticles();
 
