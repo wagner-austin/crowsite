@@ -1,5 +1,23 @@
+/**
+ * Theme Manager Module
+ *
+ * Manages theme switching between Poe light and dark variants
+ * Handles theme persistence, transitions, and observer notifications
+ *
+ * Features:
+ * - LocalStorage persistence for user preference
+ * - Smooth theme transitions
+ * - Observer pattern for theme change notifications
+ * - System dark mode detection
+ *
+ * @module theme
+ */
+
 import { Logger } from '../core/logger.js';
 
+/**
+ * Manages application themes with persistence and notifications
+ */
 export class ThemeManager {
     constructor() {
         this.logger = new Logger('ThemeManager');
@@ -8,12 +26,21 @@ export class ThemeManager {
         this.observers = [];
     }
 
+    /**
+     * Initialize theme manager
+     * Applies saved theme and sets up event listeners
+     */
     init() {
         this.applyTheme(this.currentTheme);
         this.attachEventListeners();
         this.logger.info('Theme manager initialized with theme:', this.currentTheme);
     }
 
+    /**
+     * Load theme from HTML, localStorage, or system preference
+     * Priority: HTML data-theme > localStorage > system preference > default
+     * @returns {string} Theme name to apply
+     */
     loadTheme() {
         // Check current HTML theme
         const htmlTheme = document.documentElement.dataset.theme;
@@ -39,6 +66,10 @@ export class ThemeManager {
         this.logger.info('Theme saved:', theme);
     }
 
+    /**
+     * Apply theme to document and notify observers
+     * @param {string} theme - Theme name (poe-light or poe-dark)
+     */
     applyTheme(theme) {
         if (!this.themes.includes(theme)) {
             this.logger.warn('Invalid theme:', theme);
