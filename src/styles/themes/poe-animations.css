@@ -73,24 +73,24 @@
 
 /* During zoom in animation */
 [data-theme^="poe"].animating.zoomed .parallax-far-back {
-    transform: translateZ(200px) !important;
+    transform: translate3d(0, 0, 200px) !important;
 }
 
 /* Sun's parent stays in place during zoom (using cheap class instead of :has) */
 [data-theme^="poe"].animating.zoomed .parallax-far-back.has-sun {
-    transform: translateZ(0) !important;
+    transform: translate3d(0, 0, 0) !important;
 }
 
 [data-theme^="poe"].animating.zoomed .parallax-back {
-    transform: translateZ(300px) !important;
+    transform: translate3d(0, 0, 300px) !important;
 }
 
 [data-theme^="poe"].animating.zoomed .parallax-mid {
-    transform: translateZ(400px) !important;
+    transform: translate3d(0, 0, 400px) !important;
 }
 
 [data-theme^="poe"].animating.zoomed .parallax-front {
-    transform: translateZ(600px) !important;
+    transform: translate3d(0, 0, 600px) !important;
 }
 
 /* ============================================
@@ -214,18 +214,18 @@
 
     /* Still apply the transforms without animation, but only when not forcing */
     :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-far-back {
-        transform: translateZ(200px) !important;
+        transform: translate3d(0, 0, 200px) !important;
     }
 
     :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-back {
-        transform: translateZ(300px) !important;
+        transform: translate3d(0, 0, 300px) !important;
     }
 
     :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-mid {
-        transform: translateZ(400px) !important;
+        transform: translate3d(0, 0, 400px) !important;
     }
 
     :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-front {
-        transform: translateZ(600px) !important;
+        transform: translate3d(0, 0, 600px) !important;
     }
 }
