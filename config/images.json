@@ -1,133 +1,87 @@
 {
   "profile": {
     "photo": {
-      "src": "src/assets/images/profile/developer-avatar.jpg",
-      "srcset": {
-        "1x": "src/assets/images/profile/developer-avatar.jpg",
-        "2x": "src/assets/images/profile/developer-avatar@2x.jpg",
-        "webp": "src/assets/images/profile/developer-avatar.webp",
-        "avif": "src/assets/images/profile/developer-avatar.avif"
-      },
+      "src": "",
+      "srcset": {},
       "alt": "Developer Profile",
       "caption": "Full-Stack Developer",
       "loading": "eager",
-      "display": true,
-      "effects": ["glitch", "scanlines"],
-      "animation": "fadeInUp"
+      "display": false,
+      "effects": [],
+      "animation": ""
     }
   },
   "logos": {
     "header": {
-      "src": "src/assets/images/logos/dev-terminal-logo.svg",
-      "alt": "DEV_TERMINAL",
+      "src": "",
+      "alt": "",
       "width": 200,
       "height": 60,
       "loading": "eager",
-      "display": true,
-      "darkMode": "src/assets/images/logos/dev-terminal-logo-dark.svg",
-      "animation": "glitchText"
+      "display": false,
+      "darkMode": "",
+      "animation": ""
     },
     "footer": {
-      "src": "src/assets/images/logos/dev-terminal-logo.svg",
-      "alt": "DEV_TERMINAL",
+      "src": "",
+      "alt": "",
       "width": 150,
-      "display": true
+      "display": false
     },
     "favicon": {
-      "src": "src/assets/images/logos/favicon.ico",
-      "png16": "src/assets/images/logos/favicon-16x16.png",
-      "png32": "src/assets/images/logos/favicon-32x32.png",
-      "apple": "src/assets/images/logos/apple-touch-icon.png"
+      "src": "",
+      "png16": "",
+      "png32": "",
+      "apple": ""
     }
   },
   "backgrounds": {
     "hero": {
-      "src": "src/assets/images/backgrounds/retro-grid-bg.jpg",
-      "srcset": {
-        "640w": "src/assets/images/backgrounds/retro-grid-bg-640.jpg",
-        "1024w": "src/assets/images/backgrounds/retro-grid-bg-1024.jpg",
-        "1920w": "src/assets/images/backgrounds/retro-grid-bg-1920.jpg",
-        "3840w": "src/assets/images/backgrounds/retro-grid-bg-3840.jpg"
-      },
-      "webp": {
-        "640w": "src/assets/images/backgrounds/retro-grid-bg-640.webp",
-        "1024w": "src/assets/images/backgrounds/retro-grid-bg-1024.webp",
-        "1920w": "src/assets/images/backgrounds/retro-grid-bg-1920.webp",
-        "3840w": "src/assets/images/backgrounds/retro-grid-bg-3840.webp"
-      },
+      "src": "",
+      "srcset": {},
+      "webp": {},
       "position": "center center",
       "size": "cover",
       "attachment": "fixed",
-      "overlay": "linear-gradient(180deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.4) 50%, rgba(10,10,10,0.9) 100%)",
-      "effects": ["parallax", "noise", "scanlines"],
-      "enabled": true
+      "overlay": "",
+      "effects": [],
+      "enabled": false
     },
     "sections": {
       "projects": {
-        "src": "src/assets/images/backgrounds/circuit-board-bg.jpg",
-        "overlay": "rgba(10, 10, 10, 0.85)",
-        "effects": ["pixel"],
-        "enabled": true
+        "src": "",
+        "overlay": "",
+        "effects": [],
+        "enabled": false
       },
       "skills": {
-        "src": "src/assets/images/backgrounds/matrix-rain-bg.jpg",
-        "overlay": "rgba(0, 20, 0, 0.8)",
-        "effects": ["matrix"],
-        "enabled": true
+        "src": "",
+        "overlay": "",
+        "effects": [],
+        "enabled": false
       },
       "contact": {
-        "src": "src/assets/images/backgrounds/synthwave-sunset-bg.jpg",
-        "overlay": "linear-gradient(to bottom, rgba(148, 0, 211, 0.3), rgba(255, 0, 128, 0.3))",
-        "effects": ["vhs"],
-        "enabled": true
+        "src": "",
+        "overlay": "",
+        "effects": [],
+        "enabled": false
       }
     }
   },
   "projects": {
     "thumbnails": {
-      "default": "src/assets/images/projects/default-project.jpg",
+      "default": "",
       "placeholder": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250' viewBox='0 0 400 250'%3E%3Crect width='400' height='250' fill='%231a1a1a'/%3E%3Crect x='20' y='20' width='360' height='210' fill='%230a0a0a'/%3E%3Ctext x='200' y='125' text-anchor='middle' fill='%2300ffcc' font-family='monospace' font-size='16'%3EPROJECT%3C/text%3E%3C/svg%3E"
     },
     "gallery": []
   },
   "icons": {
-    "skills": {
-      "javascript": "src/assets/images/icons/skills/javascript.svg",
-      "typescript": "src/assets/images/icons/skills/typescript.svg",
-      "python": "src/assets/images/icons/skills/python.svg",
-      "react": "src/assets/images/icons/skills/react.svg",
-      "nodejs": "src/assets/images/icons/skills/nodejs.svg",
-      "git": "src/assets/images/icons/skills/git.svg"
-    },
-    "social": {
-      "github": "src/assets/images/icons/social/github.svg",
-      "linkedin": "src/assets/images/icons/social/linkedin.svg",
-      "twitter": "src/assets/images/icons/social/twitter.svg",
-      "email": "src/assets/images/icons/social/email.svg"
-    }
+    "skills": {},
+    "social": {}
   },
   "animations": {
-    "sprites": {
-      "loading": {
-        "src": "src/assets/images/sprites/loading-spinner.png",
-        "frames": 12,
-        "fps": 24,
-        "width": 64,
-        "height": 64
-      },
-      "cursor": {
-        "src": "src/assets/images/sprites/cursor-blink.png",
-        "frames": 2,
-        "fps": 2,
-        "width": 16,
-        "height": 24
-      }
-    },
-    "gifs": {
-      "terminal": "src/assets/images/animations/terminal-typing.gif",
-      "matrix": "src/assets/images/animations/matrix-rain.gif",
-      "glitch": "src/assets/images/animations/glitch-effect.gif"
-    }
+    "sprites": {},
+    "gifs": {}
   },
   "placeholders": {
     "default": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%230a0a0a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%2300ffcc' font-family='monospace' font-size='20'%3ELoading...%3C/text%3E%3C/svg%3E",
@@ -140,7 +94,7 @@
     "formats": ["webp", "avif", "jpg", "png"],
     "breakpoints": [640, 1024, 1920, 3840],
     "lazyOffset": 100,
-    "preload": ["hero", "profile", "header-logo"],
+    "preload": [],
     "cache": {
       "enabled": true,
       "maxSize": 50,
