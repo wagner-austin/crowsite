@@ -11,7 +11,7 @@
 [data-theme^="poe"] {
     --z-header: 2000;
     --z-content: 200;
-    --z-crow: 140;
+    --z-crow: 9999;
     --z-foreground: 120;
     --z-mid: 110;
     --z-back: 100;
@@ -181,7 +181,9 @@
 }
 
 [data-theme^="poe"] .crow {
-    width: 45px;
+    position: fixed; /* Ensure fixed positioning */
+    z-index: 9999; /* Above everything */
+    width: 60px; /* Visible size on all devices */
     height: auto;
     filter: var(--filter-crow) drop-shadow(0 4px 8px var(--shadow-color));
 }
@@ -358,34 +360,26 @@
 }
 
 /* Front layer elements */
+[data-theme^="poe"] .tree-close-left,
 [data-theme^="poe"] .tree-close-right {
     position: absolute;
     top: 50%;
-    right: -2%;
-    width: auto;
-
-    /* Scale based on viewport width on narrow screens, height on wide screens */
-    height: min(110vh, 55vw);
+    height: auto;
     transform: translateY(-50%);
 }
 
 [data-theme^="poe"] .tree-close-left {
-    position: absolute;
-    top: 50%;
-    left: -2%;
-    width: auto;
-
-    /* Scale based on viewport width on narrow screens, height on wide screens */
-    height: min(110vh, 55vw);
-    transform: translateY(-50%);
+    left: -5%;
 }
 
-/* Use dynamic viewport units when supported to prevent URL bar jump */
-@supports (height: 100dvh) {
-    [data-theme^="poe"] .tree-close-left,
-    [data-theme^="poe"] .tree-close-right {
-        height: min(110dvh, 55vw);
-    }
+[data-theme^="poe"] .tree-close-right {
+    right: -5%;
+}
+
+/* Smooth visual while swapping sources */
+[data-theme^="poe"] .parallax-sprite.is-loading {
+    opacity: 0.85;
+    transition: opacity 120ms ease-out;
 }
 
 [data-theme^="poe"] .fence-bottom {
