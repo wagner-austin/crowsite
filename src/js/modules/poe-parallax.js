@@ -1,5 +1,7 @@
 /* eslint-env browser */
 
+import { createMobileDebugPanel } from './mobile-debug.js';
+
 /**
  * Poe Parallax Module
  *
@@ -117,8 +119,8 @@ export function initPoeParallax() {
 
     // Mobile optimization - reduce or disable parallax on small/touch devices
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-    const POINTER_MULT = isMobile || isCoarse ? 0 : 1; // no pointer sway on phones
+    const hasFinePointer = window.matchMedia('(any-pointer: fine)').matches;
+    const POINTER_MULT = 1; // Always allow parallax (tilt on mobile, mouse on desktop)
     const SCROLL_MULT = isMobile ? 0.3 : 1; // gentler scroll parallax on phones
 
     const MAX_X = 12;
@@ -134,6 +136,8 @@ export function initPoeParallax() {
     // pointer influence ramps 0→1 to prevent initial jump
     let influence = 0;
     let influenceTarget = 0; // 0 at load; set to 1 after first input
+    let sceneActive = true; // visible on screen?
+    let hovered = false; // pointer is over the scene?
 
     // Apply dead zone with smooth transition
     const applyDeadZone = (value, deadZone) => {
@@ -160,12 +164,16 @@ export function initPoeParallax() {
         ty = dy * MAX_Y;
     };
 
+    // Create debug panel for mobile (remove this in production)
+    const debugPanel = createMobileDebugPanel({ isMobile, hasFinePointer, POINTER_MULT });
+    const debugLog = debugPanel.log;
+
     // ===== Mobile tilt (Android + iOS) ==========================================
     // Motion sensors require HTTPS on modern browsers for security
     const mqlReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const SECURE = window.isSecureContext; // HTTPS required by Chrome/Edge/Firefox
     const HAS_TILT =
-        typeof DeviceOrientationEvent !== 'undefined' || typeof DeviceMotionEvent !== 'undefined';
+        window.DeviceOrientationEvent !== undefined || window.DeviceMotionEvent !== undefined;
 
     let tiltZero = null; // Calibration baseline - first reading becomes "center"
 
@@ -176,8 +184,9 @@ export function initPoeParallax() {
      * Handles both modern screen.orientation API and legacy window.orientation
      */
     function screenAngle() {
-        if (screen?.orientation && typeof screen.orientation.angle === 'number') {
-            return screen.orientation.angle;
+        const so = typeof screen !== 'undefined' && screen.orientation ? screen.orientation : null;
+        if (so && typeof so.angle === 'number') {
+            return so.angle;
         }
         if (typeof window.orientation === 'number') {
             return window.orientation;
@@ -190,9 +199,12 @@ export function initPoeParallax() {
      * Uses multiple methods for compatibility across browsers
      */
     function isLandscape() {
-        const t = screen?.orientation?.type || '';
+        const so = typeof screen !== 'undefined' && screen.orientation ? screen.orientation : null;
+        const t = so && typeof so.type === 'string' ? so.type : '';
         return (
-            t.includes('landscape') || Math.abs(screenAngle()) === 90 || innerWidth > innerHeight
+            t.indexOf('landscape') !== -1 ||
+            Math.abs(screenAngle()) === 90 ||
+            innerWidth > innerHeight
         );
     }
 
@@ -202,18 +214,24 @@ export function initPoeParallax() {
      * @param {DeviceOrientationEvent} e - The device orientation event
      */
     function onTilt(e) {
-        // Skip during animations, zoom state, hidden tabs, or if user prefers reduced motion
+        // Skip during animations, hidden tabs, or when scene not visible
+        // Note: We allow tilt when zoomed (parallax still works, just dampened)
         if (
             document.documentElement.classList.contains('animating') ||
-            document.documentElement.classList.contains('zoomed') ||
             document.hidden ||
-            mqlReduced.matches
+            !sceneActive
         ) {
             return;
         }
 
-        const beta = e.beta ?? 0; // front/back tilt
-        const gamma = e.gamma ?? 0; // left/right tilt
+        const beta = e && typeof e.beta === 'number' ? e.beta : 0; // front/back tilt
+        const gamma = e && typeof e.gamma === 'number' ? e.gamma : 0; // left/right tilt
+
+        // Debug log first tilt event
+        if (!tiltZero) {
+            debugLog(`[Parallax] Tilt: β${beta.toFixed(1)} γ${gamma.toFixed(1)}`);
+            debugPanel.updateTilt(beta, gamma);
+        }
 
         // Map axes depending on orientation
         let gx;
@@ -244,6 +262,11 @@ export function initPoeParallax() {
         tx = txTilt;
         ty = tyTilt;
         influenceTarget = 1; // Wake up influence for tilt
+
+        // Update debug panel with parallax values
+        if (debugPanel && debugPanel.updateParallax) {
+            debugPanel.updateParallax({ tx, ty, mx, my, influence });
+        }
     }
 
     /**
@@ -255,12 +278,14 @@ export function initPoeParallax() {
     }
 
     function attachTiltListeners() {
-        const opts = { passive: true, signal: ctrl.signal };
+        const opts = ctrl ? { passive: true, signal: ctrl.signal } : { passive: true };
         // Many browsers fire only 'deviceorientation'; some support 'deviceorientationabsolute'.
         // Listening to both is harmless; whichever fires will drive updates.
         window.addEventListener('deviceorientation', onTilt, opts);
         window.addEventListener('deviceorientationabsolute', onTilt, opts);
         window.addEventListener('orientationchange', resetTiltBaseline, opts);
+
+        debugLog('[Parallax] Tilt listeners attached');
     }
 
     /**
@@ -278,20 +303,23 @@ export function initPoeParallax() {
             'backdrop-filter:blur(6px);font:600 14px system-ui;cursor:pointer';
         btn.addEventListener(
             'click',
-            async () => {
-                try {
-                    const res = await DeviceOrientationEvent.requestPermission();
-                    if (res === 'granted') {
-                        attachTiltListeners();
-                        btn.remove();
-                    } else {
-                        btn.textContent = 'Motion blocked in iOS settings';
-                    }
-                } catch {
-                    btn.textContent = 'Motion not available';
+            () => {
+                if (DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(res => {
+                            if (res === 'granted') {
+                                attachTiltListeners();
+                                btn.remove();
+                            } else {
+                                btn.textContent = 'Motion blocked in iOS settings';
+                            }
+                        })
+                        .catch(() => {
+                            btn.textContent = 'Motion not available';
+                        });
                 }
             },
-            { passive: true, signal: ctrl.signal }
+            ctrl ? { passive: true, signal: ctrl.signal } : { passive: true }
         );
         document.body.appendChild(btn);
     }
@@ -303,11 +331,15 @@ export function initPoeParallax() {
     /**
      * Apply current parallax values to all layers
      * Updates CSS custom properties for transform values
-     * Skips during animations or when tab is hidden
+     * Skips during animations, when tab is hidden, or scene is not active
      */
     const apply = () => {
-        // Skip during animation or when hidden
-        if (document.documentElement.classList.contains('animating') || document.hidden) {
+        // Skip during animation, when hidden, or not active
+        if (
+            document.documentElement.classList.contains('animating') ||
+            document.hidden ||
+            !sceneActive
+        ) {
             return;
         }
 
@@ -380,6 +412,12 @@ export function initPoeParallax() {
         mx += (tx - mx) * k;
         my += (ty - my) * k;
         influence += (influenceTarget - influence) * r;
+
+        // Update debug panel periodically
+        if (debugPanel && debugPanel.updateParallax && isMobile) {
+            debugPanel.updateParallax({ tx, ty, mx, my, influence });
+        }
+
         apply();
         window.requestAnimationFrame(tick);
     };
@@ -388,15 +426,34 @@ export function initPoeParallax() {
     /**
      * Handle pointer/mouse movement
      * Maps pointer position to parallax targets with dead zone
-     * Activates influence on first movement
+     * Only processes when scene is active, hovered, and not animating
      */
     const onPointer = e => {
-        lastClientX = e.clientX;
-        lastClientY = e.clientY;
-        // Skip during zoom animation or when hidden
-        if (document.documentElement.classList.contains('animating') || document.hidden) {
+        // Ignore touch events for parallax (let gyro handle mobile)
+        // pointerType is 'mouse', 'pen', or 'touch'
+        if (e.pointerType === 'touch') {
+            return; // Don't process touch for parallax movement
+        }
+
+        // Self-heal if pointer is over container but hover wasn't detected
+        if (!hovered) {
+            const el = document.elementFromPoint(e.clientX, e.clientY);
+            if (el && container.contains(el)) {
+                hovered = true;
+            }
+        }
+
+        // Only react when scene is visible, hovered, and not animating/hidden
+        if (
+            !sceneActive ||
+            !hovered ||
+            document.documentElement.classList.contains('animating') ||
+            document.hidden
+        ) {
             return;
         }
+        lastClientX = e.clientX;
+        lastClientY = e.clientY;
         influenceTarget = 1;
         setTargetsFromLastPointer();
     };
@@ -405,13 +462,6 @@ export function initPoeParallax() {
         tx = 0;
         ty = 0;
         influenceTarget = 0; // ease back to neutral
-    };
-
-    const onVisibility = () => {
-        running = !document.hidden; // Ignore reduced motion
-        if (running) {
-            window.requestAnimationFrame(tick);
-        }
     };
 
     // Old onMotion removed - replaced with better tilt handling above
@@ -429,23 +479,98 @@ export function initPoeParallax() {
     });
 
     document.documentElement.addEventListener('zoom:end', () => {
-        // exact sync: no delta = no jump
+        // Deterministic rebase: keep mx/my as-is (near 0), set new targets,
+        // force amplitude to 0, then ramp back in on the next frames.
         setTargetsFromLastPointer();
-        mx = tx;
-        my = ty;
-        // Wait a bit longer before ramping influence back up
-        setTimeout(() => {
-            influenceTarget = 1;
-        }, 300); // 300ms delay before starting to ease back to mouse
+        influence = 0;
+        influenceTarget = 0;
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                influenceTarget = 1;
+            });
+        });
     });
 
-    const ctrl = new window.AbortController();
-    const opts = { passive: true, signal: ctrl.signal };
+    const ctrl = 'AbortController' in window ? new window.AbortController() : null;
+    const opts = ctrl ? { passive: true, signal: ctrl.signal } : { passive: true };
+
+    // IntersectionObserver for visibility tracking (with guard for older browsers)
+    let io = null;
+    if ('IntersectionObserver' in window) {
+        io = new IntersectionObserver(
+            entries => {
+                sceneActive = Boolean(entries && entries[0] && entries[0].isIntersecting);
+                if (!sceneActive) {
+                    // Park the scene
+                    tx = ty = 0;
+                    influenceTarget = 0;
+                }
+            },
+            { threshold: 0.1 }
+        );
+        io.observe(container);
+    }
+
+    // Check initial hover state (for when container is full viewport)
+    const checkInitialHover = () => {
+        const rect = container.getBoundingClientRect();
+        const x = lastClientX;
+        const y = lastClientY;
+        hovered = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    };
+    checkInitialHover();
+
+    // Pointer hover gates "live" input
+    container.addEventListener(
+        'pointerenter',
+        e => {
+            hovered = true;
+            // Update coords from event to avoid stale values
+            lastClientX = e.clientX;
+            lastClientY = e.clientY;
+            // Rebase and fade-in when the pointer actually matters
+            setTargetsFromLastPointer();
+            influence = 0;
+            influenceTarget = 1;
+        },
+        opts
+    );
+
+    container.addEventListener(
+        'pointerleave',
+        () => {
+            hovered = false;
+            onLeave(); // existing neutral-ease
+        },
+        opts
+    );
+
+    // Rebase on tab return/focus (covers "moved mouse while away")
+    const syncAndRamp = () => {
+        if (!sceneActive) {
+            return;
+        }
+        setTargetsFromLastPointer();
+        influence = 0;
+        influenceTarget = 1; // fade in on next frames
+    };
 
     window.addEventListener('pointermove', onPointer, opts);
-    window.addEventListener('pointerleave', onLeave, opts);
     window.addEventListener('scroll', apply, opts); // recompute on scroll
-    document.addEventListener('visibilitychange', onVisibility, { signal: ctrl.signal });
+    document.addEventListener(
+        'visibilitychange',
+        () => {
+            if (!document.hidden) {
+                running = true;
+                syncAndRamp();
+                window.requestAnimationFrame(tick);
+            } else {
+                running = false;
+            }
+        },
+        ctrl ? { signal: ctrl.signal } : {}
+    );
+    window.addEventListener('focus', syncAndRamp, opts);
 
     /**
      * Initialize tilt input for mobile devices
@@ -462,17 +587,22 @@ export function initPoeParallax() {
             typeof DeviceOrientationEvent.requestPermission === 'function';
 
         if (!SECURE) {
-            console.warn('[Parallax] Motion sensors require HTTPS; tilt disabled.');
+            debugLog('[Parallax] Need HTTPS for tilt!');
             return;
         }
+
+        debugLog(`[Parallax] iOS perm: ${needsIOSPerm}`);
+
         if (needsIOSPerm) {
+            debugLog('[Parallax] Showing iOS button');
             showIOSMotionButton(); // adds the enable button and wires listeners on grant
         } else {
+            debugLog('[Parallax] Attaching Android tilt');
             attachTiltListeners(); // Android + desktop browsers that allow without prompt
         }
 
         // Nice-to-have: rebaseline on visibility/focus
-        const opts = { passive: true, signal: ctrl.signal };
+        const opts = ctrl ? { passive: true, signal: ctrl.signal } : { passive: true };
         window.addEventListener('focus', resetTiltBaseline, opts);
         document.addEventListener(
             'visibilitychange',
@@ -481,21 +611,29 @@ export function initPoeParallax() {
                     resetTiltBaseline();
                 }
             },
-            { signal: ctrl.signal }
+            ctrl ? { signal: ctrl.signal } : {}
         );
     })();
 
     // Start perfectly centered; we won't react to pointer until it moves (or device motion fires)
     apply();
     // Optional: on touch devices, "auto-wake" pointer influence after a brief delay so the scene isn't static
-    if (isCoarse) {
+    if (!hasFinePointer) {
         setTimeout(() => {
             influenceTarget = 1;
         }, 250);
     }
 
     return () => {
-        ctrl.abort();
+        if (ctrl && typeof ctrl.abort === 'function') {
+            ctrl.abort();
+        }
+        if (io && typeof io.disconnect === 'function') {
+            io.disconnect();
+        }
+        if (debugPanel && typeof debugPanel.destroy === 'function') {
+            debugPanel.destroy();
+        }
         // Reset layer offsets on cleanup
         layers.forEach(el => {
             el.style.setProperty('--dx', '0px');
