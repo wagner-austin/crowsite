@@ -1,3 +1,24 @@
+/**
+ * Scene Animations Module
+ *
+ * Handles zoom in/out animations for the Poe theme parallax scene
+ * Manages state transitions and coordinates with parallax module
+ *
+ * Features:
+ * - Click-to-zoom on designated trigger elements
+ * - Smooth camera movement animations
+ * - Keyboard support (Enter/Space to activate, Escape to exit)
+ * - Finds triggers even when behind other elements
+ * - Proper state management to prevent animation conflicts
+ *
+ * Animation States:
+ * - Default: Normal parallax view
+ * - animating: Transition in progress (parallax paused)
+ * - zoomed: Zoomed in state (parallax dampened)
+ *
+ * @module scene-animations
+ */
+
 // src/js/modules/scene-animations.js
 import EventBus from '../core/eventBus.js';
 
@@ -51,6 +72,11 @@ export function initSceneAnimations({
         });
     };
 
+    /**
+     * Animate zoom in to the scene
+     * Adds 'animating' class during transition, then 'zoomed' when complete
+     * Dispatches events for other modules to coordinate
+     */
     const zoomIn = () => {
         console.log('[SceneAnimations] zoomIn called, locked:', locked);
         if (locked) {
@@ -85,6 +111,11 @@ export function initSceneAnimations({
         }, prepDelay);
     };
 
+    /**
+     * Animate zoom out from the scene
+     * Removes 'zoomed' class and restores normal parallax
+     * Includes mobile-specific GPU acceleration prep time
+     */
     const zoomOut = () => {
         console.log('[SceneAnimations] zoomOut called, locked:', locked);
         if (locked) {
@@ -128,7 +159,14 @@ export function initSceneAnimations({
         }
     };
 
-    // Find trigger under pointer even if behind other elements
+    /**
+     * Find trigger element under pointer coordinates
+     * Temporarily disables pointer-events on overlapping elements
+     * to find triggers that may be visually behind other content
+     * @param {number} x - Client X coordinate
+     * @param {number} y - Client Y coordinate
+     * @returns {Element|null} The trigger element if found
+     */
     const findTriggerUnderPointer = (x, y) => {
         const disabled = [];
         let hit;
@@ -153,7 +191,11 @@ export function initSceneAnimations({
         return hit?.matches?.(triggerSelector) ? hit : null;
     };
 
-    // Global delegated click (works even when <main> is on top)
+    /**
+     * Handle global click events
+     * Uses findTriggerUnderPointer to work even when triggers are behind other elements
+     * Makes triggers accessible by adding ARIA attributes
+     */
     const onClick = e => {
         console.log('[SceneAnimations] Click at:', e.clientX, e.clientY);
         const trigger = findTriggerUnderPointer(e.clientX, e.clientY);
