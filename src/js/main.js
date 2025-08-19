@@ -1,3 +1,19 @@
+/**
+ * Main Application Entry Point
+ *
+ * Orchestrates the initialization of all modules and manages the application lifecycle.
+ * Handles theme-specific module loading, error management, and performance monitoring.
+ *
+ * Features:
+ * - Lazy loading of theme-specific modules
+ * - Comprehensive error handling and observability
+ * - Performance monitoring and optimization
+ * - Responsive design support with adaptive images
+ * - Clean module lifecycle management
+ *
+ * @module main
+ */
+
 import { Logger } from './core/logger.js';
 import { Debugger } from './core/debugger.js';
 import { Config } from './core/config.js';
@@ -25,7 +41,12 @@ import { enablePoeTheme } from './modules/theme-poe.js';
 import { initPoeParallax } from './modules/poe-parallax.js';
 import { initPoeDecor } from './modules/poe-decor.js';
 import { initSceneAnimations } from './modules/scene-animations.js';
+import { initAdaptiveImages } from './modules/adaptive-images.js';
 
+/**
+ * Main application controller
+ * Manages initialization, module lifecycle, and error handling
+ */
 class App {
     constructor() {
         this.logger = new Logger('App');
@@ -71,6 +92,10 @@ class App {
         }
     }
 
+    /**
+     * Initialize Poe theme specific modules
+     * Sets up parallax, decorations, zoom animations, and adaptive images
+     */
     initializePoeTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
 
@@ -109,6 +134,11 @@ class App {
         this.themeObserver = observer;
     }
 
+    /**
+     * Initialize the application
+     * Performs compatibility checks, initializes modules, and sets up event listeners
+     * @async
+     */
     async init() {
         try {
             this.logger.group('Application Initialization');
@@ -149,6 +179,11 @@ class App {
         }
     }
 
+    /**
+     * Initialize core modules that are theme-independent
+     * Sets up animations, theme manager, and image loader
+     * @async
+     */
     async initializeModules() {
         this.logger.info('Initializing modules...');
 
@@ -178,6 +213,12 @@ class App {
 
             // Click-to-zoom scene animations
             this.sceneAnimationsCleanup = initSceneAnimations();
+
+            // Adaptive images for responsive breakpoints
+            this.adaptiveImages = initAdaptiveImages({
+                mobileBreakpoint: 768,
+            });
+            this.modules.adaptiveImages = this.adaptiveImages;
 
             // Audio manager removed for now - can be added back later
 
