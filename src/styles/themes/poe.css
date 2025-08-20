@@ -7,8 +7,9 @@
    Colors and filters come from poe-theme-system.css
 */
 
-/* --- Shared z-index stacking order --- */
+/* --- Shared variables --- */
 [data-theme^="poe"] {
+    /* Z-index stacking order */
     --z-header: 2000;
     --z-content: 200;
     --z-crow: 9999;
@@ -16,10 +17,8 @@
     --z-mid: 110;
     --z-back: 100;
     --z-overlay: 10;
-}
 
-/* --- Shared typography --- */
-[data-theme^="poe"] {
+    /* Typography */
     --font-family-primary: "Crimson Text", "Baskerville", "Georgia", serif;
     --font-family-display: "Playfair Display", "Didot", "Georgia", serif;
     --font-family-code: "Courier Prime", "Courier New", monospace;
@@ -168,7 +167,7 @@
     max-width: 70vw;
 }
 
-/* Loading states */
+/* Loading states (base - initial load is invisible) */
 [data-theme^="poe"] .parallax-sprite.is-loading {
     opacity: 0;
 }
@@ -245,7 +244,6 @@
         width: 100%;
     }
 }
-
 @keyframes blink-caret {
     50% {
         border-color: transparent;
@@ -301,18 +299,23 @@
    ============================================ */
 
 @media (prefers-reduced-motion: reduce) {
-    /* Only disable animations when not forcing motion */
-    :root:not([data-motion="force"]) [data-theme^="poe"] .crow,
-    :root:not([data-motion="force"]) [data-theme^="poe"] .feather,
-    :root:not([data-motion="force"]) [data-theme^="poe"] .particle,
-    :root:not([data-motion="force"]) [data-theme^="poe"] .typewriter-poe,
-    :root:not([data-motion="force"]) [data-theme^="poe"] .fade-in,
-    :root:not([data-motion="force"]) [data-theme^="poe"]:not(.animating) .parallax-layer {
+    /* Motion forced OFF → disable transitions/animations while not animating */
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"] .crow,
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"] .feather,
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"] .particle,
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"] .typewriter-poe,
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"] .fade-in,
+    :where(:root:not([data-motion="force"]))
+        [data-theme^="poe"]:where(:not(.animating))
+        .parallax-layer {
         transition: none !important;
         animation: none !important;
     }
 
-    :root:not([data-motion="force"]) [data-theme^="poe"]:not(.animating, .zoomed) .parallax-layer {
+    /* Motion forced OFF → also remove transforms when not animating AND not zoomed */
+    :where(:root:not([data-motion="force"]))
+        [data-theme^="poe"]:where(:not(.animating)):where(:not(.zoomed))
+        .parallax-layer {
         transform: none !important;
     }
 }
@@ -407,8 +410,8 @@
     right: -5%;
 }
 
-/* Smooth visual while swapping sources */
-[data-theme^="poe"] .parallax-sprite.is-loading {
+/* Smooth visual while swapping sources during animation */
+[data-theme^="poe"].animating .parallax-sprite.is-loading {
     opacity: 0.85;
     transition: opacity 120ms ease-out;
 }
