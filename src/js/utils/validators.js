@@ -79,62 +79,63 @@ export function isInRange(value, min, max) {
  * @param {Object} rules - Validation rules
  * @returns {Object} Validation result with errors
  */
+function validateField(field, value, fieldRules, data) {
+    // Required validation
+    if (fieldRules.required && isEmpty(value)) {
+        return `${field} is required`;
+    }
+
+    // Skip other validations if empty and not required
+    if (isEmpty(value) && !fieldRules.required) {
+        return null;
+    }
+
+    // Email validation
+    if (fieldRules.email && !isValidEmail(value)) {
+        return 'Invalid email address';
+    }
+
+    // URL validation
+    if (fieldRules.url && !isValidURL(value)) {
+        return 'Invalid URL';
+    }
+
+    // Min length validation
+    if (fieldRules.minLength && value.length < fieldRules.minLength) {
+        return `Minimum length is ${fieldRules.minLength}`;
+    }
+
+    // Max length validation
+    if (fieldRules.maxLength && value.length > fieldRules.maxLength) {
+        return `Maximum length is ${fieldRules.maxLength}`;
+    }
+
+    // Pattern validation
+    if (fieldRules.pattern && !fieldRules.pattern.test(value)) {
+        return fieldRules.message || 'Invalid format';
+    }
+
+    // Custom validation
+    if (fieldRules.custom && typeof fieldRules.custom === 'function') {
+        const result = fieldRules.custom(value, data);
+        if (result !== true) {
+            return result || 'Validation failed';
+        }
+    }
+
+    return null;
+}
+
 export function validateForm(data, rules) {
     const errors = {};
     let isValid = true;
 
     for (const [field, fieldRules] of Object.entries(rules)) {
         const value = data[field];
-
-        // Required validation
-        if (fieldRules.required && isEmpty(value)) {
-            errors[field] = `${field} is required`;
+        const error = validateField(field, value, fieldRules, data);
+        if (error) {
+            errors[field] = error;
             isValid = false;
-            continue;
-        }
-
-        // Skip other validations if empty and not required
-        if (isEmpty(value) && !fieldRules.required) {
-            continue;
-        }
-
-        // Email validation
-        if (fieldRules.email && !isValidEmail(value)) {
-            errors[field] = 'Invalid email address';
-            isValid = false;
-        }
-
-        // URL validation
-        if (fieldRules.url && !isValidURL(value)) {
-            errors[field] = 'Invalid URL';
-            isValid = false;
-        }
-
-        // Min length validation
-        if (fieldRules.minLength && value.length < fieldRules.minLength) {
-            errors[field] = `Minimum length is ${fieldRules.minLength}`;
-            isValid = false;
-        }
-
-        // Max length validation
-        if (fieldRules.maxLength && value.length > fieldRules.maxLength) {
-            errors[field] = `Maximum length is ${fieldRules.maxLength}`;
-            isValid = false;
-        }
-
-        // Pattern validation
-        if (fieldRules.pattern && !fieldRules.pattern.test(value)) {
-            errors[field] = fieldRules.message || 'Invalid format';
-            isValid = false;
-        }
-
-        // Custom validation
-        if (fieldRules.custom && typeof fieldRules.custom === 'function') {
-            const result = fieldRules.custom(value, data);
-            if (result !== true) {
-                errors[field] = result || 'Validation failed';
-                isValid = false;
-            }
         }
     }
 
