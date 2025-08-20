@@ -456,7 +456,7 @@ export class Debugger {
             return;
         }
 
-        console.trace('Debug trace');
+        console.trace('Debug trace'); // eslint-disable-line no-console
     }
 
     handleError(event) {
@@ -507,7 +507,7 @@ export class Debugger {
     }
 
     clearConsole() {
-        console.clear();
+        console.clear(); // eslint-disable-line no-console
         const consoleDiv = document.getElementById('debug-console');
         if (consoleDiv) {
             consoleDiv.innerHTML = '';
