@@ -7,6 +7,59 @@ import { Logger } from './logger.js';
 import ErrorHandler from './errorHandler.js';
 import ObservabilityManager from './observability.js';
 
+// Helper functions
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const withTimeout = (promise, ms) => {
+    if (ms > 0) {
+        return Promise.race([
+            promise,
+            new Promise((_, rej) =>
+                setTimeout(() => rej(new Error(`Operation timed out after ${ms}ms`)), ms)
+            ),
+        ]);
+    }
+    return promise;
+};
+
+function markOk(span, tx) {
+    span.setStatus('ok');
+    tx.setStatus('success');
+    ObservabilityManager.incrementCounter('async.success');
+}
+
+function logAndRecordFailure({ logger, span, opName, context, attempt, error }) {
+    logger.error(`Async operation failed: ${opName}`, {
+        attempt,
+        error: error.message,
+        stack: error.stack,
+        context,
+    });
+    span.recordException(error);
+    ObservabilityManager.incrementCounter('async.error');
+    ObservabilityManager.recordError({ type: 'async', operation: opName, attempt, error });
+}
+
+function finalizeWithFallbackOrThrow({ tx, name, context, critical, fallback, error, args }) {
+    tx.setStatus('failed');
+    ErrorHandler.handleError({
+        type: 'async',
+        operation: name,
+        message: `Async operation failed after ${args._attempt} attempts: ${error.message}`,
+        error,
+        context,
+        severity: critical ? 'critical' : 'error',
+    });
+
+    if (fallback !== null) {
+        const logger = new Logger(context.module || 'AsyncWrapper');
+        logger.warn(`Using fallback for ${name}`);
+        ObservabilityManager.incrementCounter('async.fallback');
+        return typeof fallback === 'function' ? fallback(error, ...args) : fallback;
+    }
+
+    throw error;
+}
+
 /**
  * Wrap an async function with error handling and observability
  * @param {Function} fn - Async function to wrap
@@ -25,106 +78,49 @@ export function wrapAsync(fn, options = {}) {
     } = options;
 
     return async function (...args) {
-        const transaction = ObservabilityManager.startTransaction(`async.${name}`);
-        const span = ObservabilityManager.startSpan(`async.${name}.execution`);
-
+        const tx = ObservabilityManager.startTransaction(`async.${name}`);
         let attempt = 0;
         let lastError = null;
 
-        while (attempt <= retryCount) {
-            try {
-                // Add timeout if specified
-                let promise = fn.apply(this, args);
+        try {
+            while (attempt <= retryCount) {
+                const span = ObservabilityManager.startSpan(`async.${name}.attempt.${attempt}`);
+                try {
+                    const result = await withTimeout(fn.apply(this, args), timeout);
+                    markOk(span, tx);
+                    return result;
+                } catch (error) {
+                    lastError = error;
+                    attempt += 1;
 
-                if (timeout > 0) {
-                    promise = Promise.race([
-                        promise,
-                        new Promise((_, reject) =>
-                            setTimeout(
-                                () => reject(new Error(`Operation timed out after ${timeout}ms`)),
-                                timeout
-                            )
-                        ),
-                    ]);
-                }
+                    const logger = new Logger(context.module || 'AsyncWrapper');
+                    logAndRecordFailure({ logger, span, opName: name, context, attempt, error });
 
-                const result = await promise;
-
-                // Success - record metrics
-                span.setStatus('ok');
-                transaction.setStatus('success');
-                ObservabilityManager.incrementCounter('async.success');
-
-                return result;
-            } catch (error) {
-                lastError = error;
-                attempt += 1;
-
-                // Log the error
-                const logger = new Logger(context.module || 'AsyncWrapper');
-                logger.error(`Async operation failed: ${name}`, {
-                    attempt,
-                    error: error.message,
-                    stack: error.stack,
-                    context,
-                });
-
-                // Record error in observability
-                span.recordException(error);
-                ObservabilityManager.incrementCounter('async.error');
-                ObservabilityManager.recordError({
-                    type: 'async',
-                    operation: name,
-                    attempt,
-                    error,
-                });
-
-                // Handle retry logic
-                if (attempt <= retryCount) {
-                    logger.info(`Retrying ${name} (attempt ${attempt}/${retryCount})...`);
-                    ObservabilityManager.incrementCounter('async.retry');
-
-                    // Wait before retrying
-                    const currentAttempt = attempt;
-                    await new Promise(resolve => setTimeout(resolve, retryDelay * currentAttempt));
-                    continue;
-                }
-
-                // All retries exhausted
-                span.setStatus('error');
-                transaction.setStatus('failed');
-
-                // Report to error handler
-                ErrorHandler.handleError({
-                    type: 'async',
-                    operation: name,
-                    message: `Async operation failed after ${attempt} attempts: ${error.message}`,
-                    error,
-                    context,
-                    severity: critical ? 'critical' : 'error',
-                });
-
-                // Use fallback if provided
-                if (fallback !== null) {
-                    logger.warn(`Using fallback for ${name}`);
-                    ObservabilityManager.incrementCounter('async.fallback');
-
-                    if (typeof fallback === 'function') {
-                        return await fallback(error, ...args);
+                    if (attempt <= retryCount) {
+                        logger.info(`Retrying ${name} (attempt ${attempt}/${retryCount})...`);
+                        ObservabilityManager.incrementCounter('async.retry');
+                        await sleep(retryDelay * attempt);
+                    } else {
+                        // Pass attempt via args so we can include it in the message
+                        return finalizeWithFallbackOrThrow({
+                            tx,
+                            name,
+                            context,
+                            critical,
+                            fallback,
+                            error,
+                            args: { _attempt: attempt, ...args },
+                        });
                     }
-                    return fallback;
+                } finally {
+                    span.end();
                 }
-
-                // Re-throw the error
-                throw error;
-            } finally {
-                span.end();
-                transaction.end();
             }
-        }
 
-        // This should never be reached, but just in case
-        throw lastError;
+            throw lastError;
+        } finally {
+            tx.end();
+        }
     };
 }
 
