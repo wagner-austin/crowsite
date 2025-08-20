@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 
 export default [
     js.configs.recommended,
@@ -209,4 +210,23 @@ export default [
             'yield-star-spacing': 'error',
         },
     },
+    {
+        files: ['src/js/core/logger.js', 'src/js/modules/mobile-debug.js'],
+        rules: {
+            'no-console': 'off',
+        },
+    },
+    {
+        files: ['src/js/utils/helpers.js'],
+        rules: {
+            'no-bitwise': 'off', // UUID and hash functions need bitwise operations
+        },
+    },
+    {
+        files: ['src/js/core/compatibility.js'],
+        rules: {
+            'no-extend-native': 'off', // Polyfills need to extend native prototypes
+        },
+    },
+    eslintConfigPrettier, // Must be last to override formatting rules that conflict with Prettier
 ];
