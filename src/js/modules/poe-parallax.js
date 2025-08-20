@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import { createMobileDebugPanel } from './mobile-debug.js';
+import { createMobileDebugPanel } from './mobile-debug-fixed.js';
 
 /**
  * Poe Parallax Module
@@ -44,40 +44,38 @@ function wireSprite(img, { timeoutMs = 8000, fallback = TRANSPARENT_PX } = {}) {
     }
 
     let done = false;
-    const onLoad = () => {
-        if (done) {
-            return;
-        }
-        done = true;
-        markLoaded(img);
-        img.removeEventListener('load', onLoad);
-        img.removeEventListener('error', onError);
-    };
-    const onError = () => {
-        if (done) {
-            return;
-        }
-        done = true;
-        useFallback(img, fallback);
-        img.removeEventListener('load', onLoad);
-        img.removeEventListener('error', onError);
-    };
+    let t = null;
 
-    const t = window.setTimeout(() => {
+    function onLoad() {
         if (done) {
             return;
         }
-        onError();
+        done = true;
+        if (t) {
+            window.clearTimeout(t);
+        }
+        markLoaded(img);
+    }
+
+    function onError() {
+        if (done) {
+            return;
+        }
+        done = true;
+        if (t) {
+            window.clearTimeout(t);
+        }
+        useFallback(img, fallback);
+    }
+
+    t = window.setTimeout(() => {
+        if (!done) {
+            onError();
+        }
     }, timeoutMs);
 
-    img.addEventListener('load', () => {
-        window.clearTimeout(t);
-        onLoad();
-    });
-    img.addEventListener('error', () => {
-        window.clearTimeout(t);
-        onError();
-    });
+    img.addEventListener('load', onLoad, { once: true });
+    img.addEventListener('error', onError, { once: true });
 }
 
 function wireParallaxSprites() {
@@ -91,16 +89,16 @@ export function initPoeParallax() {
     const root = document.documentElement;
     const theme = root.getAttribute('data-theme');
     if (!theme || !theme.startsWith('poe')) {
-        return () => {};
+        return () => undefined;
     }
     const container = document.querySelector('.parallax-container');
     if (!container) {
-        return () => {};
+        return () => undefined;
     }
 
     const layers = [...container.querySelectorAll('.parallax-layer')];
     if (!layers.length) {
-        return () => {};
+        return () => undefined;
     }
 
     // Wire up sprite loading with fallbacks
@@ -130,8 +128,8 @@ export function initPoeParallax() {
     let my = 0; // current
     let tx = 0;
     let ty = 0; // target
-    let lastClientX = window.innerWidth / 2;
-    let lastClientY = window.innerHeight / 2;
+    let lastClientX = (typeof window !== 'undefined' ? window.innerWidth : 0) / 2;
+    let lastClientY = (typeof window !== 'undefined' ? window.innerHeight : 0) / 2;
     let running = true; // Always run, ignore reduced motion
     // pointer influence ramps 0→1 to prevent initial jump
     let influence = 0;
@@ -154,8 +152,8 @@ export function initPoeParallax() {
 
     const setTargetsFromLastPointer = () => {
         // Normalize to -0.5 to 0.5 range
-        const nx = lastClientX / window.innerWidth - 0.5;
-        const ny = lastClientY / window.innerHeight - 0.5;
+        const nx = lastClientX / (typeof window !== 'undefined' ? window.innerWidth : 1) - 0.5;
+        const ny = lastClientY / (typeof window !== 'undefined' ? window.innerHeight : 1) - 0.5;
 
         const dx = applyDeadZone(nx, DEAD_ZONE);
         const dy = applyDeadZone(ny, DEAD_ZONE);
@@ -164,13 +162,15 @@ export function initPoeParallax() {
         ty = dy * MAX_Y;
     };
 
+    // Create abort controller for event cleanup
+    const ctrl = 'AbortController' in window ? new window.AbortController() : null;
+
     // Create debug panel for mobile (remove this in production)
     const debugPanel = createMobileDebugPanel({ isMobile, hasFinePointer, POINTER_MULT });
     const debugLog = debugPanel.log;
 
     // ===== Mobile tilt (Android + iOS) ==========================================
     // Motion sensors require HTTPS on modern browsers for security
-    const mqlReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const SECURE = window.isSecureContext; // HTTPS required by Chrome/Edge/Firefox
     const HAS_TILT =
         window.DeviceOrientationEvent !== undefined || window.DeviceMotionEvent !== undefined;
@@ -184,7 +184,10 @@ export function initPoeParallax() {
      * Handles both modern screen.orientation API and legacy window.orientation
      */
     function screenAngle() {
-        const so = typeof screen !== 'undefined' && screen.orientation ? screen.orientation : null;
+        const so =
+            typeof window !== 'undefined' && window.screen && window.screen.orientation
+                ? window.screen.orientation
+                : null;
         if (so && typeof so.angle === 'number') {
             return so.angle;
         }
@@ -199,12 +202,16 @@ export function initPoeParallax() {
      * Uses multiple methods for compatibility across browsers
      */
     function isLandscape() {
-        const so = typeof screen !== 'undefined' && screen.orientation ? screen.orientation : null;
+        const so =
+            typeof window !== 'undefined' && window.screen && window.screen.orientation
+                ? window.screen.orientation
+                : null;
         const t = so && typeof so.type === 'string' ? so.type : '';
         return (
             t.indexOf('landscape') !== -1 ||
             Math.abs(screenAngle()) === 90 ||
-            innerWidth > innerHeight
+            (typeof window !== 'undefined' ? window.innerWidth : 0) >
+                (typeof window !== 'undefined' ? window.innerHeight : 0)
         );
     }
 
@@ -234,8 +241,8 @@ export function initPoeParallax() {
         }
 
         // Map axes depending on orientation
-        let gx;
-        let gy;
+        let gx = 0;
+        let gy = 0;
         if (isLandscape()) {
             gx = beta; // forward/back controls horizontal in landscape
             gy = -gamma; // flip so left tilt moves content left
@@ -304,8 +311,12 @@ export function initPoeParallax() {
         btn.addEventListener(
             'click',
             () => {
-                if (DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) {
-                    DeviceOrientationEvent.requestPermission()
+                if (
+                    typeof window !== 'undefined' &&
+                    window.DeviceOrientationEvent &&
+                    window.DeviceOrientationEvent.requestPermission
+                ) {
+                    window.DeviceOrientationEvent.requestPermission()
                         .then(res => {
                             if (res === 'granted') {
                                 attachTiltListeners();
@@ -380,7 +391,7 @@ export function initPoeParallax() {
 
         // Log consolidated debug info
         if (debugInfo) {
-            console.log(
+            debugLog(
                 `[Parallax] mx:${mx.toFixed(1)} my:${my.toFixed(1)} | ${debugInfo.join(' | ')}`
             );
         }
@@ -491,7 +502,6 @@ export function initPoeParallax() {
         });
     });
 
-    const ctrl = 'AbortController' in window ? new window.AbortController() : null;
     const opts = ctrl ? { passive: true, signal: ctrl.signal } : { passive: true };
 
     // IntersectionObserver for visibility tracking (with guard for older browsers)
@@ -502,7 +512,8 @@ export function initPoeParallax() {
                 sceneActive = Boolean(entries && entries[0] && entries[0].isIntersecting);
                 if (!sceneActive) {
                     // Park the scene
-                    tx = ty = 0;
+                    tx = 0;
+                    ty = 0;
                     influenceTarget = 0;
                 }
             },
@@ -577,14 +588,15 @@ export function initPoeParallax() {
      * Handles both Android (automatic) and iOS (requires permission)
      * Sets up visibility/focus listeners for recalibration
      */
-    (function initTilt() {
+    (function () {
         if (!HAS_TILT) {
             return;
         }
 
         const needsIOSPerm =
-            typeof DeviceOrientationEvent !== 'undefined' &&
-            typeof DeviceOrientationEvent.requestPermission === 'function';
+            typeof window !== 'undefined' &&
+            window.DeviceOrientationEvent &&
+            typeof window.DeviceOrientationEvent.requestPermission === 'function';
 
         if (!SECURE) {
             debugLog('[Parallax] Need HTTPS for tilt!');
@@ -602,8 +614,8 @@ export function initPoeParallax() {
         }
 
         // Nice-to-have: rebaseline on visibility/focus
-        const opts = ctrl ? { passive: true, signal: ctrl.signal } : { passive: true };
-        window.addEventListener('focus', resetTiltBaseline, opts);
+        const tiltOpts = ctrl ? { passive: true, signal: ctrl.signal } : { passive: true };
+        window.addEventListener('focus', resetTiltBaseline, tiltOpts);
         document.addEventListener(
             'visibilitychange',
             () => {
