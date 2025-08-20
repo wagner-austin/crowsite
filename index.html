@@ -71,11 +71,9 @@
           class="parallax-sprite town-background theme-image"
           data-zoom-trigger
           aria-label="Enter town"
-          data-adaptive-src='{
-            "desktop": "assets/poe/backgrounds/rustic_abandoned_town_3x2.png",
-            "mobile-landscape": "assets/poe/backgrounds/rustic_abandoned_town_3x2.png",
-            "mobile-portrait": "assets/poe/backgrounds/rustic_abandoned_town_3x2.png"
-          }'
+          data-src-desktop="assets/poe/backgrounds/rustic_abandoned_town_3x2.png"
+          data-src-ml="assets/poe/backgrounds/rustic_abandoned_town_3x2.png"
+          data-src-mp="assets/poe/backgrounds/rustic_abandoned_town_3x2.png"
         />
       </div>
 
@@ -87,11 +85,9 @@
           class="parallax-sprite tree-close-right theme-image"
           decoding="async"
           fetchpriority="high"
-          data-adaptive-src='{
-            "desktop": "assets/poe/foreground/right_side_old_gnarled_tree_close_up_2x3.png",
-            "mobile-landscape": "assets/poe/foreground/right_side_old_gnarled_tree_close_up_2x3.png",
-            "mobile-portrait": "assets/poe/foreground/right_side_old_gnarled_tree_close_up_2x3.png"
-          }'
+          data-src-desktop="assets/poe/foreground/right_side_old_gnarled_tree_close_up_2x3.png"
+          data-src-ml="assets/poe/foreground/right_side_old_gnarled_tree_close_up_2x3.png"
+          data-src-mp="assets/poe/foreground/right_side_old_gnarled_tree_close_up_2x3.png"
         />
         <img
           src="assets/poe/foreground/left_side_old_gnarled_tree_close_up_2x3.png"
@@ -99,26 +95,25 @@
           class="parallax-sprite tree-close-left theme-image"
           decoding="async"
           fetchpriority="high"
-          data-adaptive-src='{
-            "desktop": "assets/poe/foreground/left_side_old_gnarled_tree_close_up_2x3.png",
-            "mobile-landscape": "assets/poe/foreground/left_side_old_gnarled_tree_close_up_2x3.png",
-            "mobile-portrait": "assets/poe/foreground/left_side_old_gnarled_tree_close_up_2x3.png"
-          }'
+          data-src-desktop="assets/poe/foreground/left_side_old_gnarled_tree_close_up_2x3.png"
+          data-src-ml="assets/poe/foreground/left_side_old_gnarled_tree_close_up_2x3.png"
+          data-src-mp="assets/poe/foreground/left_side_old_gnarled_tree_close_up_2x3.png"
         />
       </div>
     </div>
 
     <!-- SVG Filter for watercolor effect -->
+    <!-- Intentionally lowercase SVG tag names; HTML parser remaps them to proper camelCase per W3C spec -->
     <svg aria-hidden="true" focusable="false" style="position: fixed; width: 0; height: 0">
       <filter id="watercolor">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="noise"></feTurbulence>
-        <feDisplacementMap
+        <feturbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="noise"></feturbulence>
+        <fedisplacementmap
           in="SourceGraphic"
           in2="noise"
           scale="2"
           xChannelSelector="R"
           yChannelSelector="G"
-        ></feDisplacementMap>
+        ></fedisplacementmap>
       </filter>
     </svg>
 
