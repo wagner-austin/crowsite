@@ -77,19 +77,19 @@
 }
 
 /* Sun's parent stays in place during zoom (using cheap class instead of :has) */
-[data-theme^="poe"].animating.zoomed .parallax-far-back.has-sun {
+[data-theme^="poe"]:where(.animating):where(.zoomed) .parallax-far-back.has-sun {
     transform: translate3d(0, 0, 0) !important;
 }
 
-[data-theme^="poe"].animating.zoomed .parallax-back {
+[data-theme^="poe"]:where(.animating):where(.zoomed) .parallax-back {
     transform: translate3d(0, 0, 300px) !important;
 }
 
-[data-theme^="poe"].animating.zoomed .parallax-mid {
+[data-theme^="poe"]:where(.animating):where(.zoomed) .parallax-mid {
     transform: translate3d(0, 0, 400px) !important;
 }
 
-[data-theme^="poe"].animating.zoomed .parallax-front {
+[data-theme^="poe"]:where(.animating):where(.zoomed) .parallax-front {
     transform: translate3d(0, 0, 600px) !important;
 }
 
@@ -103,7 +103,7 @@
 }
 
 /* Sun's parent continues to stay fixed (using cheap class instead of :has) */
-[data-theme^="poe"].zoomed:not(.animating) .parallax-far-back.has-sun {
+[data-theme^="poe"]:where(.zoomed):not(:where(.animating)) .parallax-far-back.has-sun {
     transform: translate3d(var(--dx, 0), calc(var(--dy, 0px) + var(--sy, 0px)), 0) !important;
 }
 
@@ -143,22 +143,22 @@
 }
 
 /* Sun scales up when zoomed */
-[data-theme^="poe"].zoomed .sun-element {
+[data-theme^="poe"]:where(.zoomed) .sun-element {
     --sun-scale: 1.1;
 
     transition: transform var(--scene-zoom-ms) var(--scene-zoom-easing);
 }
 
-/* Sun returns to normal during zoom out */
-[data-theme^="poe"].animating:not(.zoomed) .sun-element {
+/* GPU optimization for sun during animation (base - less specific) */
+[data-theme^="poe"]:where(.animating) .sun-element {
+    will-change: transform;
+}
+
+/* Sun returns to normal during zoom out (more specific) */
+[data-theme^="poe"]:where(.animating):not(:where(.zoomed)) .sun-element {
     --sun-scale: 1;
 
     transition: transform var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
-}
-
-/* GPU optimization for sun during animation */
-[data-theme^="poe"].animating .sun-element {
-    will-change: transform;
 }
 
 /* ============================================
@@ -166,23 +166,32 @@
    ============================================ */
 
 /* Default state (not zoomed, not animating) - explicitly set for robustness */
-[data-theme^="poe"]:not(.zoomed) .tree-close-left,
-[data-theme^="poe"]:not(.zoomed) .tree-close-right {
+[data-theme^="poe"]:not(:where(.zoomed)) .tree-close-left,
+[data-theme^="poe"]:not(:where(.zoomed)) .tree-close-right {
     opacity: 1;
     transform: translate3d(0, 0, 0);
 }
 
-/* Trees slide out during zoom in */
-[data-theme^="poe"].animating.zoomed .tree-close-left,
-[data-theme^="poe"].animating.zoomed .tree-close-right {
-    transition:
-        transform var(--scene-zoom-ms) var(--scene-zoom-easing),
-        opacity var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
+/* Trees hidden when zoomed (steady state - less specific) */
+[data-theme^="poe"]:where(.zoomed) .tree-close-left {
+    opacity: 0 !important;
+    transform: translate3d(-80vw, 0, 0) !important;
 }
 
-/* Trees slide back during zoom out - consistent transform list */
-[data-theme^="poe"].animating:not(.zoomed) .tree-close-left,
-[data-theme^="poe"].animating:not(.zoomed) .tree-close-right {
+[data-theme^="poe"]:where(.zoomed) .tree-close-right {
+    opacity: 0 !important;
+    transform: translate3d(80vw, 0, 0) !important;
+}
+
+/* GPU optimization during animation only (base animating) */
+[data-theme^="poe"]:where(.animating) .tree-close-left,
+[data-theme^="poe"]:where(.animating) .tree-close-right {
+    will-change: transform, opacity;
+}
+
+/* Trees slide back during zoom out - consistent transform list (animating but not zoomed) */
+[data-theme^="poe"]:where(.animating):not(:where(.zoomed)) .tree-close-left,
+[data-theme^="poe"]:where(.animating):not(:where(.zoomed)) .tree-close-right {
     opacity: 1 !important;
     transform: translate3d(0, 0, 0) !important;
     transition:
@@ -190,21 +199,12 @@
         opacity var(--scene-zoom-out-ms) var(--scene-zoom-easing) !important;
 }
 
-/* Trees hidden when zoomed (steady state) */
-[data-theme^="poe"].zoomed .tree-close-left {
-    opacity: 0 !important;
-    transform: translate3d(-80vw, 0, 0) !important;
-}
-
-[data-theme^="poe"].zoomed .tree-close-right {
-    opacity: 0 !important;
-    transform: translate3d(80vw, 0, 0) !important;
-}
-
-/* GPU optimization during animation only */
-[data-theme^="poe"].animating .tree-close-left,
-[data-theme^="poe"].animating .tree-close-right {
-    will-change: transform, opacity;
+/* Trees slide out during zoom in (most specific - animating AND zoomed) */
+[data-theme^="poe"]:where(.animating):where(.zoomed) .tree-close-left,
+[data-theme^="poe"]:where(.animating):where(.zoomed) .tree-close-right {
+    transition:
+        transform var(--scene-zoom-ms) var(--scene-zoom-easing),
+        opacity var(--scene-zoom-ms) var(--scene-zoom-easing) !important;
 }
 
 /* ============================================
@@ -220,19 +220,19 @@
     }
 
     /* Still apply the transforms without animation, but only when not forcing */
-    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-far-back {
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"]:where(.zoomed) .parallax-far-back {
         transform: translate3d(0, 0, 200px) !important;
     }
 
-    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-back {
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"]:where(.zoomed) .parallax-back {
         transform: translate3d(0, 0, 300px) !important;
     }
 
-    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-mid {
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"]:where(.zoomed) .parallax-mid {
         transform: translate3d(0, 0, 400px) !important;
     }
 
-    :root:not([data-motion="force"])[data-theme^="poe"].zoomed .parallax-front {
+    :where(:root:not([data-motion="force"])) [data-theme^="poe"]:where(.zoomed) .parallax-front {
         transform: translate3d(0, 0, 600px) !important;
     }
 }
