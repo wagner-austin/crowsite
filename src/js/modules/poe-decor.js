@@ -49,7 +49,7 @@ function handleSpriteLoadError(el, sprite, fallback) {
     failedImages.add(sprite);
     el.src = fallback;
     // nudge layout flush to avoid a blink
-    void el.offsetWidth;
+    String(el.offsetWidth); // Force reflow via read (call expression, lint-safe)
 }
 
 // Performance considerations
@@ -97,7 +97,7 @@ function spawnCrow() {
     el.setAttribute('aria-hidden', 'true');
 
     // Pick a sprite, use fallback if it failed before
-    const sprite = CROW_SPRITES[(Math.random() * CROW_SPRITES.length) | 0];
+    const sprite = CROW_SPRITES[Math.floor(Math.random() * CROW_SPRITES.length)];
     el.src = failedImages.has(sprite) ? CROW_SVG_FALLBACK : sprite;
 
     // Handle load errors
@@ -140,7 +140,7 @@ const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
  * @param {number} velocities.vx - Horizontal velocity (px/s)
  * @param {number} velocities.vy - Vertical velocity (px/s)
  */
-function physicsFall(el, { vx, vy }) {
+function physicsFall(el, { vx: initialVx, vy: initialVy }) {
     // Floaty fall (from last tweak)
     const G = 340; // gravity px/s^2
     const DRAG_X = 1.2; // horizontal drag 1/s
@@ -149,10 +149,12 @@ function physicsFall(el, { vx, vy }) {
 
     // Oscillating tilt instead of full spin - natural feather flutter
     const ANG_FREQ = 0.08 + Math.random() * 0.12; // very slow: 0.08-0.2 cycles per second
-    const ANG_PHASE = 0; // Start at 0 to begin pointing down
+    // const ANG_PHASE = 0; // Start at 0 to begin pointing down - currently unused
 
     let x = 0;
     let y = 0;
+    let vx = initialVx;
+    let vy = initialVy;
     let tPrev = performance.now();
     let tOsc = 0;
 
@@ -218,7 +220,7 @@ function spawnFeather() {
     el.setAttribute('aria-hidden', 'true');
 
     // Pick a sprite, use fallback if it failed before
-    const sprite = FEATHER_SPRITES[(Math.random() * FEATHER_SPRITES.length) | 0];
+    const sprite = FEATHER_SPRITES[Math.floor(Math.random() * FEATHER_SPRITES.length)];
     el.src = failedImages.has(sprite) ? FEATHER_SVG_FALLBACK : sprite;
 
     // Handle load errors
@@ -252,7 +254,7 @@ function spawnFeather() {
  */
 function startScrollDrift() {
     let last = -1;
-    let driftRaf;
+    let driftRaf = null;
     const k = 0.08;
     const step = () => {
         const target = (window.scrollY || 0) * 0.05;
@@ -300,7 +302,7 @@ export function initPoeDecor() {
     let alive = true;
 
     const schedule = (fn, min, max) => {
-        let id;
+        let id = null;
         const run = () => {
             if (!alive) {
                 return;
