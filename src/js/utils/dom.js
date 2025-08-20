@@ -38,13 +38,14 @@ export const DOM = {
                 element.parentNode.removeChild(element);
             }
         });
+        return this;
     },
 
     append(parent, children) {
         const parentElement = typeof parent === 'string' ? document.querySelector(parent) : parent;
 
         if (!parentElement) {
-            return;
+            return this;
         }
 
         const childArray = Array.isArray(children) ? children : [children];
@@ -56,13 +57,14 @@ export const DOM = {
                 parentElement.appendChild(child);
             }
         });
+        return this;
     },
 
     prepend(parent, children) {
         const parentElement = typeof parent === 'string' ? document.querySelector(parent) : parent;
 
         if (!parentElement) {
-            return;
+            return this;
         }
 
         const childArray = Array.isArray(children) ? children : [children];
@@ -74,6 +76,7 @@ export const DOM = {
                 parentElement.insertBefore(child, parentElement.firstChild);
             }
         });
+        return this;
     },
 
     addClass(element, ...classNames) {
@@ -85,6 +88,7 @@ export const DOM = {
                 el.classList.add(...classNames);
             }
         });
+        return this;
     },
 
     removeClass(element, ...classNames) {
@@ -96,6 +100,7 @@ export const DOM = {
                 el.classList.remove(...classNames);
             }
         });
+        return this;
     },
 
     toggleClass(element, className) {
@@ -107,6 +112,7 @@ export const DOM = {
                 el.classList.toggle(className);
             }
         });
+        return this;
     },
 
     hasClass(element, className) {
@@ -143,6 +149,7 @@ export const DOM = {
                 element.removeEventListener(event, handler, options);
             }
         });
+        return this;
     },
 
     once(selector, event, handler, options = {}) {
@@ -152,13 +159,14 @@ export const DOM = {
         };
 
         this.on(selector, event, wrappedHandler, options);
+        return this;
     },
 
     delegate(parent, selector, event, handler) {
         const parentElement = typeof parent === 'string' ? document.querySelector(parent) : parent;
 
         if (!parentElement) {
-            return;
+            return this;
         }
 
         const delegatedHandler = e => {
@@ -181,13 +189,14 @@ export const DOM = {
         } else {
             document.addEventListener('DOMContentLoaded', callback);
         }
+        return this;
     },
 
     attr(element, attribute, value) {
         const el = typeof element === 'string' ? document.querySelector(element) : element;
 
         if (!el) {
-            return;
+            return value === undefined ? undefined : this;
         }
 
         if (value === undefined) {
@@ -199,13 +208,14 @@ export const DOM = {
         } else {
             el.setAttribute(attribute, value);
         }
+        return this;
     },
 
     data(element, key, value) {
         const el = typeof element === 'string' ? document.querySelector(element) : element;
 
         if (!el) {
-            return;
+            return value === undefined ? undefined : this;
         }
 
         if (value === undefined) {
@@ -213,6 +223,7 @@ export const DOM = {
         }
 
         el.dataset[key] = value;
+        return this;
     },
 
     style(element, styles) {
@@ -224,6 +235,7 @@ export const DOM = {
                 Object.assign(el.style, styles);
             }
         });
+        return this;
     },
 
     show(element) {
@@ -235,6 +247,7 @@ export const DOM = {
                 el.style.display = '';
             }
         });
+        return this;
     },
 
     hide(element) {
@@ -246,13 +259,14 @@ export const DOM = {
                 el.style.display = 'none';
             }
         });
+        return this;
     },
 
     html(element, content) {
         const el = typeof element === 'string' ? document.querySelector(element) : element;
 
         if (!el) {
-            return;
+            return content === undefined ? undefined : this;
         }
 
         if (content === undefined) {
@@ -260,13 +274,14 @@ export const DOM = {
         }
 
         el.innerHTML = content;
+        return this;
     },
 
     text(element, content) {
         const el = typeof element === 'string' ? document.querySelector(element) : element;
 
         if (!el) {
-            return;
+            return content === undefined ? undefined : this;
         }
 
         if (content === undefined) {
@@ -274,13 +289,14 @@ export const DOM = {
         }
 
         el.textContent = content;
+        return this;
     },
 
     value(element, val) {
         const el = typeof element === 'string' ? document.querySelector(element) : element;
 
         if (!el) {
-            return;
+            return val === undefined ? undefined : this;
         }
 
         if (val === undefined) {
@@ -288,6 +304,7 @@ export const DOM = {
         }
 
         el.value = val;
+        return this;
     },
 
     parent(element) {
