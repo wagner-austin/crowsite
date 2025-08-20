@@ -563,7 +563,8 @@ export class ObservabilityManager {
             timestamp: Date.now(),
         };
 
-        this.logger.info(`Event: ${name}`, attributes);
+        // Commented out to reduce log spam - uncomment if debugging events
+        // this.logger.info(`Event: ${name}`, attributes);
 
         // Emit to EventBus for other components
         EventBus.emit('observability:event', event);
@@ -754,8 +755,10 @@ export class ObservabilityManager {
 
             setInterval(() => {
                 const start = performance.now();
-                // Busy wait for 10ms
-                while (performance.now() - start < 10) {}
+                // Busy wait for 10ms - intentional spin to sample blocking
+                for (; performance.now() - start < 10; ) {
+                    // Intentional busy-wait to sample main-thread blocking
+                }
                 const actualTime = performance.now() - start;
 
                 // If it took longer than 10ms, the thread was blocked
