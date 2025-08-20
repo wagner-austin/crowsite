@@ -25,7 +25,7 @@
 // Adaptive image system for responsive breakpoints with jank-free swaps
 export function initAdaptiveImages({
     mobileBreakpoint = 768,
-    selector = '[data-adaptive-src]',
+    selector = '[data-adaptive-src], [data-src-desktop]',
 } = {}) {
     let current = '';
     let paused = false;
@@ -55,21 +55,20 @@ export function initAdaptiveImages({
         if (!url || img.src.endsWith(url)) {
             return;
         }
+
+        function onLoad() {
+            img.style.opacity = '1';
+        }
+
+        function onError() {
+            img.style.opacity = '1';
+        }
+
         // simple fade to avoid pop-in (optional)
         img.style.transition = 'opacity 120ms';
         img.style.opacity = '0';
-        const onload = () => {
-            img.style.opacity = '1';
-            img.removeEventListener('load', onload);
-            img.removeEventListener('error', onerr);
-        };
-        const onerr = () => {
-            img.style.opacity = '1';
-            img.removeEventListener('load', onload);
-            img.removeEventListener('error', onerr);
-        };
-        img.addEventListener('load', onload, { once: true });
-        img.addEventListener('error', onerr, { once: true });
+        img.addEventListener('load', onLoad, { once: true });
+        img.addEventListener('error', onError, { once: true });
         img.src = url;
     };
 
@@ -98,13 +97,22 @@ export function initAdaptiveImages({
         document.documentElement.setAttribute('data-device', next);
 
         getImages().forEach(img => {
-            // Example dataset:
-            // data-adaptive-src='{"desktop":"...3x2.png","mobile-portrait":"...2x3.png","mobile-landscape":"...3x2.png"}'
-            let sources;
-            try {
-                sources = JSON.parse(img.dataset.adaptiveSrc || '{}');
-            } catch {
-                sources = {};
+            // Support both formats: JSON (data-adaptive-src) and separate attributes (data-src-*)
+            let sources = {};
+            const json = img.getAttribute('data-adaptive-src');
+            if (json) {
+                try {
+                    sources = JSON.parse(json);
+                } catch {
+                    sources = {};
+                }
+            } else {
+                const { srcDesktop, srcMl, srcMp } = img.dataset;
+                sources = {
+                    desktop: srcDesktop,
+                    'mobile-landscape': srcMl,
+                    'mobile-portrait': srcMp,
+                };
             }
             const wanted =
                 sources[next] ||
