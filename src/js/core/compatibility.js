@@ -99,7 +99,10 @@ export class Compatibility {
     checkAsyncSupport() {
         try {
             // Check for async function support without eval
-            const AsyncFunction = async function () {}.constructor;
+            const AsyncFunction = async function () {
+                await Promise.resolve(1);
+                return undefined;
+            }.constructor;
             return typeof AsyncFunction === 'function';
         } catch (error) {
             this.logger.debug('Feature check failed', error);
