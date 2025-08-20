@@ -94,10 +94,11 @@ export class Performance {
             // Observe long tasks
             const taskObserver = new PerformanceObserver(list => {
                 for (const entry of list.getEntries()) {
-                    this.logger.warn('Long task detected', {
-                        duration: entry.duration,
-                        startTime: entry.startTime,
-                    });
+                    // Commented out to reduce log spam - uncomment if debugging performance
+                    // this.logger.warn('Long task detected', {
+                    //     duration: entry.duration,
+                    //     startTime: entry.startTime,
+                    // });
                     ObservabilityManager.recordEvent('performance.longTask', {
                         duration: entry.duration,
                         startTime: entry.startTime,
@@ -502,7 +503,7 @@ export class Performance {
     logReport() {
         const metrics = this.getMetrics();
 
-        console.group('Performance Report');
+        this.logger.group('Performance Report');
         this.logger.info('Performance Metrics', {
             fps: metrics.fps,
             memory: metrics.memory,
@@ -520,7 +521,7 @@ export class Performance {
         ObservabilityManager.recordMetric('performance.fcp', metrics.fcp);
         ObservabilityManager.recordMetric('performance.lcp', metrics.lcp);
         ObservabilityManager.recordMetric('performance.tti', metrics.tti);
-        console.groupEnd();
+        this.logger.groupEnd();
     }
 
     /**
