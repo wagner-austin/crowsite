@@ -21,6 +21,9 @@
 
 // src/js/modules/scene-animations.js
 import EventBus from '../core/eventBus.js';
+import { Logger } from '../core/logger.js';
+
+const logger = new Logger('SceneAnimations');
 
 export function initSceneAnimations({
     triggerSelector = '[data-zoom-trigger]',
@@ -28,14 +31,18 @@ export function initSceneAnimations({
     parallaxPauseClass = 'zoomed',
     ignoreReducedMotion = true,
 } = {}) {
-    console.log('[SceneAnimations] Initializing with selector:', triggerSelector);
+    logger.info('Initializing with selector:', triggerSelector);
 
     const root = document.documentElement.matches(rootSelector)
         ? document.documentElement
         : document.querySelector(rootSelector);
     if (!root) {
-        console.warn('[SceneAnimations] Root element not found');
-        return { destroy() {} };
+        logger.warn('Root element not found');
+        return {
+            destroy() {
+                // No-op when root element not found
+            },
+        };
     }
 
     // Force animations even when OS has reduced motion enabled
@@ -78,14 +85,17 @@ export function initSceneAnimations({
      * Dispatches events for other modules to coordinate
      */
     const zoomIn = () => {
-        console.log('[SceneAnimations] zoomIn called, locked:', locked);
+        logger.info('🔍 Zoom in called, locked:', locked);
         if (locked) {
             return;
         }
         locked = true;
         root.classList.add('animating'); // 1) enable transitions
-        void root.getBoundingClientRect(); // arm transitions for Android
-        document.documentElement.dispatchEvent(new CustomEvent('zoom:start'));
+        logger.info('🎬 State: animating');
+        root.getBoundingClientRect(); // arm transitions for Android
+        document.documentElement.dispatchEvent(
+            new (window.CustomEvent || window.Event)('zoom:start')
+        );
         // Add delay for mobile to prepare GPU acceleration
         const isMobile =
             window.matchMedia('(max-width: 768px)').matches ||
@@ -95,17 +105,21 @@ export function initSceneAnimations({
         window.setTimeout(() => {
             requestAnimationFrame(() => {
                 // 2) next frame, change state
-                console.log('[SceneAnimations] Adding class:', parallaxPauseClass);
+                logger.info('🎬 Adding class:', parallaxPauseClass);
                 root.classList.add(parallaxPauseClass); // adds .zoomed
+                logger.info('🎬 State: zoomed');
                 setPressed(true);
                 EventBus.emit('scene:zoom', { state: 'in' });
                 window.setTimeout(() => {
                     root.classList.remove('animating'); // 3) clean up
+                    logger.info('🎬 Animation complete: zoomed in');
                     document.documentElement.dispatchEvent(
-                        new CustomEvent('zoom:end', { detail: { direction: 'in' } })
+                        new (window.CustomEvent || window.Event)('zoom:end', {
+                            detail: { direction: 'in' },
+                        })
                     );
                     locked = false;
-                    console.log('[SceneAnimations] Zoom in complete');
+                    logger.debug('Zoom in complete');
                 }, zoomInMs + 100);
             });
         }, prepDelay);
@@ -117,14 +131,16 @@ export function initSceneAnimations({
      * Includes mobile-specific GPU acceleration prep time
      */
     const zoomOut = () => {
-        console.log('[SceneAnimations] zoomOut called, locked:', locked);
+        logger.info('🔍 Zoom out called, locked:', locked);
         if (locked) {
             return;
         }
         locked = true;
         root.classList.add('animating');
-        void root.getBoundingClientRect(); // arm transitions for Android
-        document.documentElement.dispatchEvent(new CustomEvent('zoom:start'));
+        root.getBoundingClientRect(); // arm transitions for Android
+        document.documentElement.dispatchEvent(
+            new (window.CustomEvent || window.Event)('zoom:start')
+        );
         // Add delay for mobile to prepare GPU acceleration
         const isMobile =
             window.matchMedia('(max-width: 768px)').matches ||
@@ -133,17 +149,19 @@ export function initSceneAnimations({
 
         window.setTimeout(() => {
             requestAnimationFrame(() => {
-                console.log('[SceneAnimations] Removing class:', parallaxPauseClass);
+                logger.debug('Removing class:', parallaxPauseClass);
                 root.classList.remove(parallaxPauseClass); // removes .zoomed
                 setPressed(false);
                 EventBus.emit('scene:zoom', { state: 'out' });
                 window.setTimeout(() => {
                     root.classList.remove('animating');
                     document.documentElement.dispatchEvent(
-                        new CustomEvent('zoom:end', { detail: { direction: 'out' } })
+                        new (window.CustomEvent || window.Event)('zoom:end', {
+                            detail: { direction: 'out' },
+                        })
                     );
                     locked = false;
-                    console.log('[SceneAnimations] Zoom out complete');
+                    logger.debug('Zoom out complete');
                 }, zoomOutMs + 100);
             });
         }, prepDelay);
@@ -151,7 +169,7 @@ export function initSceneAnimations({
 
     const toggleZoom = () => {
         const isZoomed = root.classList.contains(parallaxPauseClass);
-        console.log('[SceneAnimations] Toggle zoom, currently zoomed:', isZoomed);
+        logger.info('🔍 Toggle zoom, currently zoomed:', isZoomed);
         if (isZoomed) {
             zoomOut();
         } else {
@@ -234,9 +252,9 @@ export function initSceneAnimations({
 
     // Check if any triggers exist at init time
     const triggers = document.querySelectorAll(triggerSelector);
-    console.log(`[SceneAnimations] Found ${triggers.length} trigger elements at init`);
+    logger.info(`Found ${triggers.length} trigger elements at init`);
     triggers.forEach((el, i) => {
-        console.log(`[SceneAnimations] Trigger ${i}:`, el);
+        logger.debug(`Trigger ${i}:`, el);
     });
 
     // If theme changes away from Poe, clear zoom state
