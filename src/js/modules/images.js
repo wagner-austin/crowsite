@@ -364,7 +364,6 @@ export class ImageManager {
         const src = element.dataset.src || element.dataset.lazy;
         const { srcset } = element.dataset;
         const { sizes } = element.dataset;
-        const { effect } = element.dataset;
 
         if (!src) {
             return;
