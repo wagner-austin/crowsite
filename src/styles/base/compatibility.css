@@ -67,7 +67,7 @@
 }
 
 /* Animations */
-@keyframes fadeIn {
+@keyframes fade-in {
     from {
         opacity: 0;
     }
@@ -76,8 +76,7 @@
         opacity: 1;
     }
 }
-
-@keyframes fadeIn {
+@keyframes fade-in {
     from {
         opacity: 0;
     }
@@ -86,8 +85,7 @@
         opacity: 1;
     }
 }
-
-@keyframes fadeIn {
+@keyframes fade-in {
     from {
         opacity: 0;
     }
@@ -96,8 +94,7 @@
         opacity: 1;
     }
 }
-
-@keyframes fadeIn {
+@keyframes fade-in {
     from {
         opacity: 0;
     }
@@ -259,7 +256,7 @@ body {
 
 /* Gap property fallback for flexbox */
 @supports not (gap: 1rem) {
-    .gap-4 > * + * {
+    .gap-4 > :not(:first-child) {
         margin-left: 1rem;
     }
 }
@@ -295,32 +292,7 @@ body {
     color: var(--color-background, #0a0a0a);
 }
 
-::selection {
-    background: var(--color-primary, #00ffcc);
-    color: var(--color-background, #0a0a0a);
-}
-
 /* Placeholder styles */
-::input-placeholder {
-    opacity: 1;
-    color: var(--color-text-muted, #666666);
-}
-
-::placeholder {
-    opacity: 1;
-    color: var(--color-text-muted, #666666);
-}
-
-:input-placeholder {
-    opacity: 1;
-    color: var(--color-text-muted, #666666);
-}
-
-::input-placeholder {
-    opacity: 1;
-    color: var(--color-text-muted, #666666);
-}
-
 ::placeholder {
     opacity: 1;
     color: var(--color-text-muted, #666666);
