@@ -1,8 +1,8 @@
 .fade-in {
-    animation: fadeIn 0.5s ease-out;
+    animation: fade-in 0.5s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
     from {
         opacity: 0;
     }
@@ -13,10 +13,10 @@
 }
 
 .slide-up {
-    animation: slideUp 0.5s ease-out;
+    animation: slide-up 0.5s ease-out;
 }
 
-@keyframes slideUp {
+@keyframes slide-up {
     from {
         opacity: 0;
         transform: translateY(30px);
@@ -29,10 +29,10 @@
 }
 
 .slide-down {
-    animation: slideDown 0.5s ease-out;
+    animation: slide-down 0.5s ease-out;
 }
 
-@keyframes slideDown {
+@keyframes slide-down {
     from {
         opacity: 0;
         transform: translateY(-30px);
@@ -45,10 +45,10 @@
 }
 
 .zoom-in {
-    animation: zoomIn 0.5s ease-out;
+    animation: zoom-in 0.5s ease-out;
 }
 
-@keyframes zoomIn {
+@keyframes zoom-in {
     from {
         opacity: 0;
         transform: scale(0.8);
@@ -61,10 +61,10 @@
 }
 
 .rotate-in {
-    animation: rotateIn 0.5s ease-out;
+    animation: rotate-in 0.5s ease-out;
 }
 
-@keyframes rotateIn {
+@keyframes rotate-in {
     from {
         opacity: 0;
         transform: rotate(-180deg);
