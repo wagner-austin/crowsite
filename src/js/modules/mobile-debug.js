@@ -29,7 +29,7 @@ export function createMobileDebugPanel(options = {}) {
     let tiltEventCount = 0;
     let lastTiltValues = { beta: 0, gamma: 0 };
     let lastParallaxValues = { mx: 0, my: 0, tx: 0, ty: 0, influence: 0 };
-    
+
     // Track console logs
     const logBuffer = [];
     const MAX_LOGS = 100;
@@ -438,7 +438,7 @@ export function createMobileDebugPanel(options = {}) {
 
     const createLogsContent = () => {
         let content = '';
-        
+
         // Add mode toggle at the top
         content += `
             <div style="
@@ -475,35 +475,37 @@ export function createMobileDebugPanel(options = {}) {
                 </span>
             </div>
         `;
-        
+
         // Filter logs based on mode
-        const filteredLogs = logMode === 'info' 
-            ? logBuffer.filter(log => log.type !== 'debug') // Show everything except debug
-            : logBuffer;
-        
+        const filteredLogs =
+            logMode === 'info'
+                ? logBuffer.filter(log => log.type !== 'debug') // Show everything except debug
+                : logBuffer;
+
         if (filteredLogs.length === 0) {
             content += `<div style="color: #666; text-align: center; padding: 20px;">
                 ${logBuffer.length === 0 ? 'No logs captured yet' : 'No logs match current filter'}
             </div>`;
         } else {
-            content += '<div style="max-height: 45vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">';
-            
+            content +=
+                '<div style="max-height: 45vh; overflow-y: auto; -webkit-overflow-scrolling: touch;">';
+
             // Show logs in reverse order (newest first)
             [...filteredLogs].reverse().forEach((log, index) => {
-                const timeStr = new Date(log.timestamp).toLocaleTimeString('en-US', { 
+                const timeStr = new Date(log.timestamp).toLocaleTimeString('en-US', {
                     hour12: false,
                     hour: '2-digit',
                     minute: '2-digit',
                     second: '2-digit',
-                    fractionalSecondDigits: 3
+                    fractionalSecondDigits: 3,
                 });
-                
+
                 // Style based on log type
                 let color = '#fff';
                 let bgColor = 'rgba(255,255,255,0.02)';
                 let icon = '📝';
-                
-                switch(log.type) {
+
+                switch (log.type) {
                     case 'error':
                         color = '#ff4444';
                         bgColor = 'rgba(255,0,0,0.1)';
@@ -530,7 +532,7 @@ export function createMobileDebugPanel(options = {}) {
                         bgColor = 'rgba(0,255,0,0.05)';
                         icon = '📝';
                 }
-                
+
                 content += `
                     <div style="
                         margin-bottom: 8px;
@@ -555,7 +557,9 @@ export function createMobileDebugPanel(options = {}) {
                         <div style="color: ${color}; line-height: 1.3;">
                             ${log.message}
                         </div>
-                        ${log.stack ? `<div style="
+                        ${
+                            log.stack
+                                ? `<div style="
                             margin-top: 4px;
                             padding-top: 4px;
                             border-top: 1px solid rgba(255,255,255,0.1);
@@ -563,13 +567,15 @@ export function createMobileDebugPanel(options = {}) {
                             font-size: 9px;
                             font-family: monospace;
                             white-space: pre-wrap;
-                        ">${log.stack}</div>` : ''}
+                        ">${log.stack}</div>`
+                                : ''
+                        }
                     </div>
                 `;
             });
-            
+
             content += '</div>';
-            
+
             // Add clear button at bottom
             content += `
                 <div style="
@@ -590,7 +596,7 @@ export function createMobileDebugPanel(options = {}) {
                 </div>
             `;
         }
-        
+
         return content;
     };
 
@@ -676,7 +682,7 @@ export function createMobileDebugPanel(options = {}) {
             </div>
             ${content}
         `;
-        
+
         // Add event listeners for logs tab controls
         if (activeTab === 'logs') {
             const clearBtn = contentArea.querySelector('#clear-logs-btn');
@@ -686,7 +692,7 @@ export function createMobileDebugPanel(options = {}) {
                     updateContent();
                 });
             }
-            
+
             const infoBtn = contentArea.querySelector('#log-mode-info');
             if (infoBtn) {
                 infoBtn.addEventListener('click', () => {
@@ -694,7 +700,7 @@ export function createMobileDebugPanel(options = {}) {
                     updateContent();
                 });
             }
-            
+
             const debugBtn = contentArea.querySelector('#log-mode-debug');
             if (debugBtn) {
                 debugBtn.addEventListener('click', () => {
@@ -773,52 +779,121 @@ export function createMobileDebugPanel(options = {}) {
     // Add to DOM
     document.body.appendChild(toggleBtn);
     document.body.appendChild(panel);
-    
+
     // Intercept console methods to capture logs
     const originalConsole = {
         log: console.log,
         error: console.error,
         warn: console.warn,
         info: console.info,
-        debug: console.debug
+        debug: console.debug,
     };
-    
+
     const captureLog = (type, args) => {
         // Call original console method
         originalConsole[type].apply(console, args);
-        
-        // Capture for debug panel
-        const message = Array.from(args).map(arg => {
-            if (typeof arg === 'object') {
-                try {
-                    return JSON.stringify(arg, null, 2);
-                } catch (e) {
-                    return String(arg);
+
+        // Skip capturing if no arguments
+        if (!args.length) return;
+
+        let actualType = type;
+        let cleanMessage = '';
+
+        // Debug - log what we're receiving
+        if (args[0] && typeof args[0] === 'string' && args[0].includes('[SceneAnimations]')) {
+            originalConsole.log('DEBUG captureLog args:', args);
+        }
+
+        // Check if this is a styled log from Logger class (starts with %c)
+        if (typeof args[0] === 'string' && args[0].startsWith('%c')) {
+            const fullMessage = args[0].substring(2); // Remove %c prefix
+
+            // Extract log level from formatted message [timestamp] [context] [LEVEL] message
+            const bracketPattern = /\[([^\]]+)\]/g;
+            const matches = [];
+            let match;
+            while ((match = bracketPattern.exec(fullMessage)) !== null) {
+                matches.push(match[1]);
+            }
+
+            // Third bracket should be the log level
+            if (matches.length >= 3) {
+                const level = matches[2].toLowerCase();
+                // Map Logger levels to console types
+                if (level === 'debug' || level === 'trace') {
+                    actualType = 'debug';
+                } else if (level === 'info' || level === 'success') {
+                    actualType = 'info';
+                } else if (level === 'warning') {
+                    actualType = 'warn';
+                } else if (level === 'error') {
+                    actualType = 'error';
                 }
             }
-            return String(arg);
-        }).join(' ');
-        
+
+            // Extract the actual message (everything after the third bracket)
+            const messageStart = fullMessage.lastIndexOf('] ');
+            if (messageStart !== -1) {
+                cleanMessage = fullMessage.substring(messageStart + 2);
+            } else {
+                cleanMessage = fullMessage;
+            }
+
+            // Add any additional data arguments (skip the style argument at index 1)
+            if (args.length > 2) {
+                const additionalArgs = args
+                    .slice(2)
+                    .map(arg => {
+                        if (typeof arg === 'object') {
+                            try {
+                                return JSON.stringify(arg, null, 2);
+                            } catch (e) {
+                                return String(arg);
+                            }
+                        }
+                        return String(arg);
+                    })
+                    .join(' ');
+                if (additionalArgs) {
+                    cleanMessage += ` ${additionalArgs}`;
+                }
+            }
+        } else {
+            // Regular console message - just join all arguments
+            cleanMessage = Array.from(args)
+                .map(arg => {
+                    if (typeof arg === 'object') {
+                        try {
+                            return JSON.stringify(arg, null, 2);
+                        } catch (e) {
+                            return String(arg);
+                        }
+                    }
+                    return String(arg);
+                })
+                .join(' ');
+        }
+
         const logEntry = {
-            type,
-            message,
+            type: actualType,
+            message: cleanMessage,
             timestamp: Date.now(),
-            stack: type === 'error' && args[0] instanceof Error ? args[0].stack : null
+            stack: actualType === 'error' && args[0] instanceof Error ? args[0].stack : null,
         };
-        
+
         logBuffer.push(logEntry);
-        
+
         // Keep buffer size limited
         if (logBuffer.length > MAX_LOGS) {
             logBuffer.shift();
         }
-        
+
         // Update display if logs tab is active
         if (activeTab === 'logs' && !isCollapsed) {
             updateContent();
         }
     };
-    
+
     // Override console methods
     console.log = (...args) => captureLog('log', args);
     console.error = (...args) => captureLog('error', args);
@@ -875,12 +950,12 @@ export function createMobileDebugPanel(options = {}) {
         console.warn = originalConsole.warn;
         console.info = originalConsole.info;
         console.debug = originalConsole.debug;
-        
+
         // Remove event listeners
         window.removeEventListener('resize', handleResize);
         window.removeEventListener('orientationchange', handleResize);
         window.visualViewport?.removeEventListener('resize', handleResize);
-        
+
         // Remove DOM elements
         toggleBtn.remove();
         panel.remove();
