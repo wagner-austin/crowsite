@@ -123,11 +123,9 @@ export class Animations {
                 this.animations.delete(element);
                 element.classList.add(`animated-${animation}`);
             };
-
-            return anim;
+        } else {
+            element.classList.add(`animated-${animation}`);
         }
-        element.classList.add(`animated-${animation}`);
-        return undefined;
     }
 
     glitch(selector, duration = 500) {
