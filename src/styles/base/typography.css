@@ -178,7 +178,6 @@
             0 -0.05em 0 rgba(0, 0, 255, 0.75);
     }
 }
-
 @keyframes glitch-1 {
     0%,
     100% {
@@ -206,7 +205,6 @@
         transform: translate(1px, -1px);
     }
 }
-
 @keyframes glitch-2 {
     0%,
     100% {
