@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import { createMobileDebugPanel } from './mobile-debug-fixed.js';
+import { createMobileDebugPanel } from './mobile-debug.js';
 
 /**
  * Poe Parallax Module
