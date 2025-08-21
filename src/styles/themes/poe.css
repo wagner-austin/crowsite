@@ -120,7 +120,7 @@
 [data-theme^="poe"] .parallax-front {
     z-index: var(--z-foreground);
 
-    /* No overscan at all - exact viewport size for proper tree positioning */
+    /* No overscan - exact viewport positioning */
     inset: 0;
     width: 100%;
     height: 100%;
